@@ -145,13 +145,28 @@ TAB_SCRIPT = """<script>
   (function () {
     var tabs = document.querySelectorAll('.tab-btn');
     var panels = document.querySelectorAll('.tab-panel');
+    function activate(tabId) {
+      tabs.forEach(function (b) { b.classList.toggle('active', b.dataset.tab === tabId); });
+      panels.forEach(function (p) { p.hidden = (p.id !== tabId); });
+    }
     tabs.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        tabs.forEach(function (b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        panels.forEach(function (p) { p.hidden = (p.id !== btn.dataset.tab); });
-      });
+      btn.addEventListener('click', function () { activate(btn.dataset.tab); });
     });
+    // Deep-links: a hash like #archived, #gold or #mu opens whichever tab
+    // contains the target and scrolls to it (used by the portfolio's
+    // "View live tracker" buttons). No hash = default (Current Projects).
+    function applyHash() {
+      var id = (location.hash || '').replace('#', '');
+      if (!id) return;
+      var target = document.getElementById(id);
+      var panel = target ? target.closest('.tab-panel') : null;
+      if (panel) {
+        activate(panel.id);
+        if (target !== panel) target.scrollIntoView();
+      }
+    }
+    applyHash();
+    window.addEventListener('hashchange', applyHash);
   })();
 </script>"""
 
