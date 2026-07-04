@@ -101,6 +101,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   </header>
   <nav class="tabs">
     <button class="tab-btn active" data-tab="archived" type="button">Archived Projects</button>
+    <button class="tab-btn" data-tab="current" type="button">Current Projects</button>
   </nav>
   <main>
     <div id="archived" class="tab-panel">
@@ -126,6 +127,9 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
           <div>{mu_summary}</div>
         </div>
       </section>
+    </div>
+    <div id="current" class="tab-panel" hidden>
+      <!-- Current Projects: content to be added later. -->
     </div>
   </main>
   <footer>
