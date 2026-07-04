@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gold (GC) June 2026 settlement odds — data + chart module for the dashboard.
+"""Gold (GC) June 2026 settlement odds - data + chart module for the dashboard.
 
 Fetches live odds from Polymarket's gamma API, appends to a CSV history store,
 and can backfill the full market history from the CLOB API. Exposes:
@@ -7,7 +7,7 @@ and can backfill the full market history from the CLOB API. Exposes:
   - make_figure(rows, labels) -> plotly Figure
   - make_summary(rows, labels) -> html string
 
-No email / SMTP / matplotlib here — this is the hosted, website-only variant.
+No email / SMTP / matplotlib here - this is the hosted, website-only variant.
 """
 import csv
 import json
@@ -92,7 +92,7 @@ def backfill():
     """Fill history.csv from the CLOB API back to market creation. Never
     overwrites existing rows (real daily snapshots with volume win). Drops any
     row dated in the future relative to the current UTC date (UTC/CLOB boundary
-    artifact). Safe to call every run — it only adds missing past dates."""
+    artifact). Safe to call every run - it only adds missing past dates."""
     tokens = fetch_bracket_tokens()
     labels = sorted(tokens.keys(), key=bracket_sort_key)
 
@@ -202,7 +202,7 @@ def make_figure(rows, labels):
         ))
     fig.update_layout(
         template="plotly_dark",
-        title="Gold (GC) June 2026 Settlement — Polymarket Odds",
+        title="Gold (GC) June 2026 Settlement - Polymarket Odds",
         yaxis=dict(title="Probability (%)", range=[0, 100]),
         xaxis=dict(title="Date"),
         hovermode="x unified",

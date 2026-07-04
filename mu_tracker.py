@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Micron (MU) daily price + EMAs — data + chart module for the dashboard.
+"""Micron (MU) daily price + EMAs - data + chart module for the dashboard.
 
 Fetches ~1yr of daily OHLCV from Yahoo Finance's public chart endpoint,
 maintains a CSV history, computes 9/21/48-day EMAs, and detects crossovers.
@@ -9,7 +9,7 @@ Exposes:
   - make_figure(rows, emas) -> plotly Figure
   - make_summary(rows, emas) -> html string
 
-No email / SMTP / matplotlib — hosted, website-only variant.
+No email / SMTP / matplotlib - hosted, website-only variant.
 """
 import csv
 from datetime import datetime, timedelta, timezone
@@ -189,7 +189,7 @@ def make_figure(rows, emas):
         ))
     fig.update_layout(
         template="plotly_dark",
-        title=f"{TICKER} — Close with 9/21/48-day EMAs",
+        title=f"{TICKER} - Close with 9/21/48-day EMAs",
         yaxis=dict(title="Price (USD)"),
         xaxis=dict(title="Date"),
         hovermode="x unified",

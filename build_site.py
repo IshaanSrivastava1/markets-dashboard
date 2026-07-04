@@ -21,7 +21,7 @@ def build_gold_section():
         rows, labels = gold_tracker.update_data()
     except Exception as exc:
         print(f"[gold] live update failed, using stored data: {exc}")
-        note = "<p class='error'>Live update unavailable today — showing last stored data.</p>"
+        note = "<p class='error'>Live update unavailable today, showing last stored data.</p>"
         rows, labels = gold_tracker.read_history()
     fig = gold_tracker.make_figure(rows, labels)
     summary = gold_tracker.make_summary(rows, labels)
@@ -35,7 +35,7 @@ def build_mu_section():
         rows = mu_tracker.update_data()
     except Exception as exc:
         print(f"[mu] live update failed, using stored data: {exc}")
-        note = "<p class='error'>Live update unavailable today — showing last stored data.</p>"
+        note = "<p class='error'>Live update unavailable today, showing last stored data.</p>"
         rows = mu_tracker.load_rows()
     emas = mu_tracker.compute_emas(rows)
     fig = mu_tracker.make_figure(rows, emas)
@@ -50,7 +50,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Markets Dashboard — Gold Odds &amp; MU Trends</title>
+  <title>Markets Dashboard - Gold Odds &amp; MU Trends</title>
   <meta name="description" content="Auto-updating dashboard: Polymarket gold settlement odds and Micron (MU) price with EMAs. Rebuilt daily via GitHub Actions."/>
   <style>
     :root {{ color-scheme: dark; }}
@@ -110,7 +110,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
         <div class="grid">
           <div>
             {gold_chart}
-            <p class="description">The purpose of this tracker was to find correlations in the movements of prediction market odds to the movements of the underlying asset — and send a summary of these daily changes to myself for evaluation.</p>
+            <p class="description">The purpose of this tracker was to find correlations in the movements of prediction market odds to the movements of the underlying asset, and send a summary of these daily changes to myself for evaluation.</p>
           </div>
           <div>{gold_summary}</div>
         </div>
@@ -121,7 +121,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
         <div class="grid">
           <div>
             {mu_chart}
-            <p class="description">This tracker was created to send automated alerts to myself whenever MU broke below its 9-day or 21-day EMA — since I was using these metrics to trade this ticker at the time.</p>
+            <p class="description">This tracker was created to send automated alerts to myself whenever MU broke below its 9-day or 21-day EMA, since I was using these metrics to trade this ticker at the time.</p>
           </div>
           <div>{mu_summary}</div>
         </div>
@@ -129,7 +129,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     </div>
   </main>
   <footer>
-    Data: Polymarket (gamma + CLOB APIs) and Yahoo Finance. For personal/informational use — not financial advice.
+    Data: Polymarket (gamma + CLOB APIs) and Yahoo Finance. For personal/informational use - not financial advice.
   </footer>
   {script}
 </body>
