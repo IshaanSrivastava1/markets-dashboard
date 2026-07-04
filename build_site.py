@@ -83,6 +83,15 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     .grid {{ display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; align-items: start; }}
     @media (max-width: 760px) {{ .grid {{ grid-template-columns: 1fr; }} }}
     footer {{ max-width: 1000px; margin: 0 auto; padding: 8px 20px 40px; color: #666; font-size: 0.85rem; }}
+    nav.tabs {{ max-width: 1000px; margin: 0 auto; padding: 8px 20px 0; display: flex; gap: 8px; flex-wrap: wrap; }}
+    .tab-btn {{
+      background: #111; color: #e5e5e5; border: 1px solid #222; border-radius: 8px;
+      padding: 8px 16px; font-size: 0.95rem; cursor: pointer;
+    }}
+    .tab-btn:hover {{ border-color: #3b82f6; }}
+    .tab-btn.active {{ background: #1e293b; border-color: #3b82f6; color: #fff; }}
+    .tab-panel[hidden] {{ display: none; }}
+    .description {{ color: #aaa; font-size: 0.92rem; margin: 12px 2px 0; max-width: 640px; }}
   </style>
 </head>
 <body>
@@ -90,30 +99,57 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     <h1>Markets Dashboard</h1>
     <p>Auto-updated daily via GitHub Actions · Last updated {updated} UTC</p>
   </header>
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="archived" type="button">Archived Projects</button>
+  </nav>
   <main>
-    <section id="gold">
-      <h2>Gold (GC) June 2026 Settlement Odds</h2>
-      {gold_note}
-      <div class="grid">
-        <div>{gold_chart}</div>
-        <div>{gold_summary}</div>
-      </div>
-    </section>
-    <section id="mu">
-      <h2>Micron (MU) Price &amp; EMAs</h2>
-      {mu_note}
-      <div class="grid">
-        <div>{mu_chart}</div>
-        <div>{mu_summary}</div>
-      </div>
-    </section>
+    <div id="archived" class="tab-panel">
+      <section id="gold">
+        <h2>old - V1 Gold (GC) June 2026 Settlement Odds</h2>
+        {gold_note}
+        <div class="grid">
+          <div>
+            {gold_chart}
+            <p class="description">The purpose of this tracker was to find correlations in the movements of prediction market odds to the movements of the underlying asset — and send a summary of these daily changes to myself for evaluation.</p>
+          </div>
+          <div>{gold_summary}</div>
+        </div>
+      </section>
+      <section id="mu">
+        <h2>old - V1 Micron (MU) EMA Trend Tracker</h2>
+        {mu_note}
+        <div class="grid">
+          <div>
+            {mu_chart}
+            <p class="description">This tracker was created to send automated alerts to myself whenever MU broke below its 9-day or 21-day EMA — since I was using these metrics to trade this ticker at the time.</p>
+          </div>
+          <div>{mu_summary}</div>
+        </div>
+      </section>
+    </div>
   </main>
   <footer>
     Data: Polymarket (gamma + CLOB APIs) and Yahoo Finance. For personal/informational use — not financial advice.
   </footer>
+  {script}
 </body>
 </html>
 """
+
+
+TAB_SCRIPT = """<script>
+  (function () {
+    var tabs = document.querySelectorAll('.tab-btn');
+    var panels = document.querySelectorAll('.tab-panel');
+    tabs.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        tabs.forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        panels.forEach(function (p) { p.hidden = (p.id !== btn.dataset.tab); });
+      });
+    });
+  })();
+</script>"""
 
 
 def main():
@@ -124,6 +160,7 @@ def main():
         updated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M"),
         gold_chart=gold_chart, gold_summary=gold_summary, gold_note=gold_note,
         mu_chart=mu_chart, mu_summary=mu_summary, mu_note=mu_note,
+        script=TAB_SCRIPT,
     )
 
     OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
