@@ -100,11 +100,14 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     <p>Auto-updated daily via GitHub Actions. Last updated {updated} UTC</p>
   </header>
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="archived" type="button">Archived Projects</button>
-    <button class="tab-btn" data-tab="current" type="button">Current Projects</button>
+    <button class="tab-btn active" data-tab="current" type="button">Current Projects</button>
+    <button class="tab-btn" data-tab="archived" type="button">Archived Projects</button>
   </nav>
   <main>
-    <div id="archived" class="tab-panel">
+    <div id="current" class="tab-panel">
+      <!-- Current Projects: content to be added later. -->
+    </div>
+    <div id="archived" class="tab-panel" hidden>
       <section id="gold">
         <h2>old - V1 Gold (GC) June 2026 Settlement Odds</h2>
         {gold_note}
@@ -127,9 +130,6 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
           <div>{mu_summary}</div>
         </div>
       </section>
-    </div>
-    <div id="current" class="tab-panel" hidden>
-      <!-- Current Projects: content to be added later. -->
     </div>
   </main>
   <footer>
