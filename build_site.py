@@ -97,7 +97,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <body>
   <header>
     <h1>Markets Dashboard</h1>
-    <p>Auto-updated daily via GitHub Actions · Last updated {updated} UTC</p>
+    <p>Auto-updated daily via GitHub Actions. Last updated {updated} UTC</p>
   </header>
   <nav class="tabs">
     <button class="tab-btn active" data-tab="archived" type="button">Archived Projects</button>
@@ -129,7 +129,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     </div>
   </main>
   <footer>
-    Data: Polymarket (gamma + CLOB APIs) and Yahoo Finance. For personal/informational use - not financial advice.
+    Data: Polymarket (gamma + CLOB APIs) and Yahoo Finance. For personal/informational use not financial advice.
   </footer>
   {script}
 </body>

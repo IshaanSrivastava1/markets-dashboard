@@ -202,7 +202,7 @@ def make_figure(rows, labels):
         ))
     fig.update_layout(
         template="plotly_dark",
-        title="Gold (GC) June 2026 Settlement - Polymarket Odds",
+        title="Gold (GC) June 2026 Settlement Polymarket Odds",
         yaxis=dict(title="Probability (%)", range=[0, 100]),
         xaxis=dict(title="Date"),
         hovermode="x unified",

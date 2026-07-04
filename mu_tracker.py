@@ -189,7 +189,7 @@ def make_figure(rows, emas):
         ))
     fig.update_layout(
         template="plotly_dark",
-        title=f"{TICKER} - Close with 9/21/48-day EMAs",
+        title=f"{TICKER} Closing Prices with 9/21/48 day EMAs",
         yaxis=dict(title="Price (USD)"),
         xaxis=dict(title="Date"),
         hovermode="x unified",
