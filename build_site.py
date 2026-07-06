@@ -106,7 +106,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   <main>
     <div id="current" class="tab-panel">
       <section id="arb">
-        <h2>Gold Arbitrage Tracker (V3)</h2>
+        <h2>Gold Arbitrage Tracker (V3.2)</h2>
         <p class="description">Scans every open gold-price market on Polymarket and
         Kalshi every 30 minutes, normalizes them into one schema, and flags
         combinations of contracts that are logically mispriced against each other
@@ -116,7 +116,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     </div>
     <div id="archived" class="tab-panel" hidden>
       <section id="gold">
-        <h2>old - V1 Gold (GC) June 2026 Settlement Odds</h2>
+        <h2>old - V2 Gold (GC) June 2026 Settlement Odds</h2>
         {gold_note}
         <div class="grid">
           <div>
@@ -127,7 +127,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
         </div>
       </section>
       <section id="mu">
-        <h2>old - V1 Micron (MU) EMA Trend Tracker</h2>
+        <h2>old - V2 Micron (MU) EMA Trend Tracker</h2>
         {mu_note}
         <div class="grid">
           <div>

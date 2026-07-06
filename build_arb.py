@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gold arbitrage tracker (V3) - page builder.
+"""Gold arbitrage tracker (V3.2) - page builder.
 
 Entry point for the 30-minute GitHub Actions workflow (arb.yml). Fetches all
 live gold contracts from Polymarket + Kalshi (arb_sources), runs the detection
@@ -93,7 +93,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
   <header>
-    <h1>Gold Arbitrage Tracker <span class="muted">V3</span></h1>
+    <h1>Gold Arbitrage Tracker <span class="muted">V3.2</span></h1>
     <p>Polymarket &times; Kalshi &middot; refreshed every 30 minutes via GitHub Actions &middot;
        last updated {updated} UTC &middot; <a href="index.html">back to dashboard</a></p>
   </header>
