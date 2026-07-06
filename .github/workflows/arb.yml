@@ -1,0 +1,47 @@
+name: Update arbitrage tracker
+
+on:
+  schedule:
+    # Every 30 minutes. Arbitrage windows are short-lived; the daily
+    # update.yml cadence is far too slow for this page.
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-arb
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run engine tests
+        run: python -m unittest test_arb_engine
+
+      - name: Build arbitrage page
+        run: python build_arb.py
+
+      - name: Commit updated page + data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/arb.html data/arb_current.csv data/arb_log.csv
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Arb tracker update ($(date -u +%Y-%m-%dT%H:%M))"
+            # The daily dashboard workflow may push concurrently; rebase first.
+            git pull --rebase
+            git push
+          fi

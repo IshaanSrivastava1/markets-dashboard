@@ -105,7 +105,14 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   </nav>
   <main>
     <div id="current" class="tab-panel">
-      <!-- Current Projects: content to be added later. -->
+      <section id="arb">
+        <h2>Gold Arbitrage Tracker (V3)</h2>
+        <p class="description">Scans every open gold-price market on Polymarket and
+        Kalshi every 30 minutes, normalizes them into one schema, and flags
+        combinations of contracts that are logically mispriced against each other
+        (net of fees) &mdash; guaranteed-payout trades priced below their payout.</p>
+        <p><a href="arb.html">Open the live tracker &rarr;</a></p>
+      </section>
     </div>
     <div id="archived" class="tab-panel" hidden>
       <section id="gold">
