@@ -180,15 +180,32 @@ def _kalshi_get(path):
     return _get_json(KALSHI_BASE + path)
 
 
-def _kalshi_settlement_source(series_ticker):
+def _slugify(title):
+    return re.sub(r"-{2,}", "-", re.sub(r"[^a-z0-9]", "-", title.lower())).strip("-")
+
+
+def _kalshi_series_info(series_ticker):
+    """(settlement_source, web-url title slug) from the series endpoint."""
+    source, slug = "Kalshi settlement", None
     try:
         series = _kalshi_get("/series/" + series_ticker).get("series", {})
         sources = [s.get("name", "") for s in series.get("settlement_sources", [])]
         if sources:
-            return "Kalshi via " + ", ".join(filter(None, sources))
+            source = "Kalshi via " + ", ".join(filter(None, sources))
+        if series.get("title"):
+            slug = _slugify(series["title"])
     except Exception as exc:
-        print("[kalshi] series %s source lookup failed: %s" % (series_ticker, exc))
-    return "Kalshi settlement"
+        print("[kalshi] series %s lookup failed: %s" % (series_ticker, exc))
+    return source, slug
+
+
+def _kalshi_url(series_ticker, series_slug, event_ticker):
+    """Deep link to the event page: /markets/{series}/{title-slug}/{event}
+    (format confirmed against indexed kalshi.com pages)."""
+    if not series_slug:
+        return "https://kalshi.com/markets/%s" % series_ticker.lower()
+    return "https://kalshi.com/markets/%s/%s/%s" % (
+        series_ticker.lower(), series_slug, event_ticker.lower())
 
 
 def _kalshi_classify(market):
@@ -208,7 +225,7 @@ def fetch_kalshi_contracts():
     fetched_at = _now_iso()
     contracts = []
     for series_ticker in KALSHI_GOLD_SERIES:
-        source = _kalshi_settlement_source(series_ticker)
+        source, series_slug = _kalshi_series_info(series_ticker)
         try:
             events = _kalshi_get(
                 "/events?series_ticker=%s&status=open&limit=200" % series_ticker
@@ -244,7 +261,7 @@ def fetch_kalshi_contracts():
                     market_id=m["ticker"],
                     event_id=event_ticker,
                     title="%s — %s" % (event.get("title", ""), m.get("yes_sub_title", "")),
-                    url="https://kalshi.com/markets/%s" % series_ticker.lower(),
+                    url=_kalshi_url(series_ticker, series_slug, event_ticker),
                     underlying=XAU_SPOT,  # Kalshi gold series settle on spot gold candles
                     settlement_source=source,
                     semantics=semantics,

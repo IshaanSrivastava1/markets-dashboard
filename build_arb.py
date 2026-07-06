@@ -110,6 +110,13 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
       {opportunities}
     </section>
     <section>
+      <h2>Recently spotted</h2>
+      <p class="explain">First sighting of each opportunity the scanner has flagged
+      (it checks every 30 minutes; most edges vanish within a few scans). Full history
+      in <a href="https://github.com/IshaanSrivastava1/markets-dashboard/blob/main/data/arb_log.csv">arb_log.csv</a>.</p>
+      {history}
+    </section>
+    <section>
       <h2>Price ladders</h2>
       <p class="explain">Each line is one market's ladder of price levels: how likely
       the platform thinks gold reaches each level (mid price). Consistent pricing
@@ -156,6 +163,48 @@ def _relative(iso_str):
     if seconds >= 2 * 3600:
         return "in %d hours" % int(seconds // 3600)
     return "in %d min" % max(1, int(seconds // 60))
+
+
+def _ago(iso_str):
+    """Human-relative time since an ISO timestamp: '12 min ago', '3 days ago'."""
+    dt = _parse_iso(iso_str)
+    if dt is None:
+        return "-"
+    seconds = (datetime.now(timezone.utc) - dt).total_seconds()
+    if seconds < 0:
+        return "just now"
+    if seconds >= 2 * 86400:
+        return "%d days ago" % int(seconds // 86400)
+    if seconds >= 2 * 3600:
+        return "%d hours ago" % int(seconds // 3600)
+    return "%d min ago" % max(1, int(seconds // 60))
+
+
+def _history_rows(opportunities, limit=10):
+    """Last `limit` first-sightings from the log, newest first, flagged if the
+    same trade is still open right now."""
+    if not LOG_FILE.exists():
+        return "<p class='empty'>Nothing logged yet.</p>"
+    with LOG_FILE.open() as f:
+        entries = list(csv.DictReader(f))
+    if not entries:
+        return "<p class='empty'>Nothing logged yet.</p>"
+    open_now = {_fingerprint(o) for o in opportunities}
+    rows = []
+    for e in reversed(entries[-limit:]):
+        seen = e.get("seen_at", "")
+        absolute = seen[:16].replace("T", " ") + " UTC"
+        badge = (" <span class='pill up'>still open</span>"
+                 if e.get("fingerprint") in open_now else "")
+        rows.append(
+            "<tr class='divider'><td><span title='%s'>%s</span></td>"
+            "<td><span class='pill'>%s</span></td><td>$%s%s</td>"
+            "<td class='muted'>%s</td></tr>"
+            % (html.escape(absolute), _ago(seen), html.escape(e.get("kind", "-")),
+               html.escape(e.get("net_edge", "-")), badge,
+               html.escape(e.get("description", ""))))
+    return ("<div class='tablewrap'><table><tr><th>First seen</th><th>Type</th>"
+            "<th>Net edge</th><th>What</th></tr>%s</table></div>" % "".join(rows))
 
 
 def _when(iso_str):
@@ -365,6 +414,9 @@ def main():
     now = datetime.now(timezone.utc)
     now_iso = now.strftime("%Y-%m-%dT%H:%M:%SZ")
 
+    # Log first so this run's new sightings appear in its own history section.
+    new_count = _write_csvs(opportunities, now_iso)
+
     fig = make_ladder_figure(contracts)
     ladder_chart = (fig.to_html(full_html=False, include_plotlyjs="cdn") if fig
                     else "<p class='empty'>No ladders with live quotes right now.</p>")
@@ -373,6 +425,7 @@ def main():
         updated=now.strftime("%Y-%m-%d %H:%M"),
         tiles=_tiles(contracts, opportunities),
         opportunities=_opportunity_rows(opportunities),
+        history=_history_rows(opportunities),
         ladder_chart=ladder_chart,
         n_contracts=len(contracts),
         contracts_table=_contracts_table(contracts),
@@ -380,7 +433,6 @@ def main():
     OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     OUT_FILE.write_text(html_out)
 
-    new_count = _write_csvs(opportunities, now_iso)
     print("Wrote %s (%d contracts, %d opportunities, %d newly seen)"
           % (OUT_FILE, len(contracts), len(opportunities), new_count))
 
