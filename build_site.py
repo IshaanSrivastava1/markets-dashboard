@@ -106,7 +106,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   <main>
     <div id="current" class="tab-panel">
       <section id="arb">
-        <h2>Gold Arbitrage Tracker (V3.3)</h2>
+        <h2>Gold Arbitrage Tracker (V3.5)</h2>
         <p class="description">Scans every open gold-price market on Polymarket and
         Kalshi every 30 minutes, normalizes them into one schema, and flags
         combinations of contracts that are logically mispriced against each other

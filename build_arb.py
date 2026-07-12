@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gold arbitrage tracker (V3.3) - page builder.
+"""Gold arbitrage tracker (V3.5) - page builder.
 
 Entry point for the 30-minute GitHub Actions workflow (arb.yml). Fetches all
 live gold contracts from Polymarket + Kalshi (arb_sources), runs the detection
@@ -39,6 +39,31 @@ LADDER_COLORS = ["#3b82f6", "#ef4444", "#0891b2", "#d97706",
 # Newest first. A hand-maintained record of what shipped on this page - not
 # derived from git history, so it can explain *why* in plain language.
 CHANGELOG = [
+    {
+        "version": "v3.5", "date": "2026-07-12",
+        "title": "Freshness & clarity",
+        "tags": ["live freshness", "stale warning", "count fix"],
+        "description": (
+            "The header now shows how long ago the data was refreshed (\"updated "
+            "12 minutes ago\") and raises a banner if the 30-minute auto-refresh "
+            "appears to have stalled, so you can tell live numbers from stale "
+            "ones at a glance. The \"opportunities now\" count also now matches the "
+            "grouped list instead of the raw pre-grouping total."
+        ),
+    },
+    {
+        "version": "v3.4", "date": "2026-07-12",
+        "title": "Cleaner opportunity list & contracts table",
+        "tags": ["grouped variants", "event sections", "bug fix"],
+        "description": (
+            "Opportunities that reuse one leg against several strikes are now "
+            "grouped — the best is shown with a \"not additive\" note (they draw "
+            "on one shared order book) and the rest listed compactly beneath, "
+            "instead of near-duplicate rows. The full contracts table is grouped "
+            "under named per-event headers, and a bug that hid each variant's "
+            "distinguishing strike was fixed."
+        ),
+    },
     {
         "version": "v3.3", "date": "2026-07-12",
         "title": "Order-book depth sizing",
@@ -150,14 +175,23 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
       letter-spacing: 0.02em; padding: 8px 12px; border-top: 1px solid #222;
     }}
     tr.group-head .gh-plat {{ color: #60a5fa; }}
+    #freshness {{ white-space: nowrap; }}
+    .stale-banner {{
+      max-width: 1100px; margin: 16px auto 0; padding: 10px 16px;
+      background: #3a2a00; border: 1px solid #7a5a00; border-radius: 10px;
+      color: #fbbf24; font-size: 0.9rem;
+    }}
+    .stale-banner[hidden] {{ display: none; }}
   </style>
 </head>
 <body>
   <header>
-    <h1>Gold Arbitrage Tracker <span class="muted">V3.3</span></h1>
+    <h1>Gold Arbitrage Tracker <span class="muted">V3.5</span></h1>
     <p>Polymarket &times; Kalshi &middot; refreshed every 30 minutes via GitHub Actions &middot;
-       last updated {updated} UTC &middot; <a href="index.html">back to dashboard</a></p>
+       last updated <span id="freshness" data-updated="{updated_iso}">{updated} UTC</span>
+       &middot; <a href="index.html">back to dashboard</a></p>
   </header>
+  <div id="stale-banner" class="stale-banner" hidden></div>
   <div class="tiles">{tiles}</div>
   <main>
     <section>
@@ -212,6 +246,39 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     aren't walked, and Kalshi's per-order fee rounding isn't modeled - so treat marginal
     edges as indicative. Personal/informational use, not financial advice.
   </footer>
+  <script>
+  (function () {{
+    var el = document.getElementById('freshness');
+    var banner = document.getElementById('stale-banner');
+    if (!el) return;
+    var updated = new Date(el.getAttribute('data-updated'));
+    var absolute = el.textContent.trim();
+    function fmt(ms) {{
+      var s = Math.max(0, Math.floor(ms / 1000));
+      var m = Math.floor(s / 60);
+      if (m < 1) return 'just now';
+      if (m < 90) return m + ' minute' + (m === 1 ? '' : 's') + ' ago';
+      var h = Math.floor(m / 60);
+      if (h < 48) return h + ' hour' + (h === 1 ? '' : 's') + ' ago';
+      var d = Math.floor(h / 24);
+      return d + ' day' + (d === 1 ? '' : 's') + ' ago';
+    }}
+    function tick() {{
+      var age = Date.now() - updated.getTime();
+      el.textContent = absolute + ' \\u00b7 updated ' + fmt(age);
+      el.title = absolute;
+      if (age > 90 * 60 * 1000) {{
+        banner.hidden = false;
+        banner.textContent = '\\u26a0 Auto-refresh may have stalled \\u2014 this data was last ' +
+          'refreshed ' + fmt(age) + ' (it normally updates every 30 minutes).';
+      }} else {{
+        banner.hidden = true;
+      }}
+    }}
+    tick();
+    setInterval(tick, 60000);
+  }})();
+  </script>
 </body>
 </html>
 """
@@ -306,10 +373,16 @@ def _tiles(contracts, opportunities):
     live = sum(1 for c in contracts if c.has_quotes())
     caps = [o.capturable for o in opportunities if o.capturable is not None]
     best = _fmt_money(max(caps)) if caps else "&mdash;"
+    # The list groups shared-leg variants, so the headline count is the number
+    # of distinct opportunities shown, not the raw detected total.
+    distinct = len(_cluster_opportunities(opportunities))
+    total = len(opportunities)
+    opp_label = ("opportunities now &middot; %d with variants" % total
+                 if total > distinct else "opportunities now")
     tiles = [
         ("%d" % len(contracts), "contracts scanned"),
         ("%d" % live, "with live books"),
-        ("%d" % len(opportunities), "opportunities now"),
+        ("%d" % distinct, opp_label),
         (best, "best capturable profit"),
     ]
     return "".join(
@@ -675,6 +748,7 @@ def main():
 
     html_out = PAGE_TEMPLATE.format(
         updated=now.strftime("%Y-%m-%d %H:%M"),
+        updated_iso=now_iso,
         tiles=_tiles(contracts, opportunities),
         opportunities=_opportunity_rows(opportunities),
         history=_history_rows(opportunities),
