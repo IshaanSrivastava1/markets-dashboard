@@ -63,6 +63,7 @@ class Contract:
     mutually_exclusive: bool          # true if the event's markets form exclusive brackets
     fetched_at: str
     token_ids: Optional[list] = None  # Polymarket [yesToken, noToken]; None for Kalshi
+    event_title: Optional[str] = None # human name of the parent event (for grouping)
 
     def has_quotes(self):
         """True if there is a real two-sided book (not an empty 0-bid/1-ask shell)."""
@@ -125,6 +126,7 @@ def fetch_polymarket_contracts():
     for event in events:
         slug = event.get("slug", "")
         url = "https://polymarket.com/event/" + slug
+        event_title = event.get("title") or slug
         mutually_exclusive = bool(event.get("negRisk"))
         for m in event.get("markets", []):
             if m.get("closed"):
@@ -171,6 +173,7 @@ def fetch_polymarket_contracts():
                 mutually_exclusive=mutually_exclusive,
                 fetched_at=fetched_at,
                 token_ids=token_ids,
+                event_title=event_title,
             ))
     if skipped:
         print("[polymarket] skipped %d non-price market(s): %s"
@@ -241,6 +244,7 @@ def fetch_kalshi_contracts():
             continue
         for event in events:
             event_ticker = event["event_ticker"]
+            event_title = event.get("title") or event_ticker
             markets = []
             cursor = ""
             while True:
@@ -283,6 +287,7 @@ def fetch_kalshi_contracts():
                     volume_24h=_to_float(m.get("volume_24h_fp") or m.get("volume_24h")),
                     mutually_exclusive=bool(event.get("mutually_exclusive")),
                     fetched_at=fetched_at,
+                    event_title=event_title,
                 ))
     return contracts
 

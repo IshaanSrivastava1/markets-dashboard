@@ -142,6 +142,14 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     .change-date {{ color: #666; font-weight: 400; font-size: 0.85rem; }}
     .change-entry p {{ margin: 0 0 8px; color: #aaa; font-size: 0.92rem; max-width: 68ch; }}
     .change-tags {{ display: flex; flex-wrap: wrap; gap: 6px; }}
+    .variant-row td {{ padding-top: 0; }}
+    ul.variants {{ margin: 4px 0 2px; padding-left: 18px; color: #aaa; font-size: 0.88rem; }}
+    ul.variants li {{ margin: 2px 0; }}
+    tr.group-head td {{
+      background: #161616; font-weight: 700; font-size: 0.85rem;
+      letter-spacing: 0.02em; padding: 8px 12px; border-top: 1px solid #222;
+    }}
+    tr.group-head .gh-plat {{ color: #60a5fa; }}
   </style>
 </head>
 <body>
@@ -162,7 +170,9 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
       subtracted; Polymarket charges no trading fee. <strong>Capturable</strong> is the edge
       times how many contracts are actually available at that price in the live order book
       (the thinner leg caps the position) &mdash; rows are ranked by it, so a small edge on a
-      deep book can outrank a big edge you could only fill once.</p>
+      deep book can outrank a big edge you could only fill once. Opportunities that reuse the
+      same leg against different strikes are grouped (best shown, the rest listed underneath)
+      since they draw on one shared order book.</p>
       {opportunities}
     </section>
     <section>
@@ -389,63 +399,156 @@ def make_ladder_figure(contracts):
     return fig
 
 
+def _leg_key(leg):
+    return (leg.contract.platform, leg.contract.market_id, leg.action)
+
+
+def _short_title(title):
+    """Trim a market question to something legend-length."""
+    return title.split(" — ")[0].strip()
+
+
+def _cluster_opportunities(opportunities):
+    """Group opportunities that share a leg (same platform+market+side). Those
+    variants draw on one shared order book, so their capturable isn't additive.
+    Returns (shared_leg_key_or_None, [opps]) clusters, best capturable first,
+    variants within a cluster also sorted best first."""
+    counts = {}
+    for o in opportunities:
+        for leg in o.legs:
+            counts[_leg_key(leg)] = counts.get(_leg_key(leg), 0) + 1
+
+    clusters = {}
+    for i, o in enumerate(opportunities):
+        shared = [k for k in (_leg_key(l) for l in o.legs) if counts[k] > 1]
+        # Cluster on the most-shared leg; opps with no shared leg stand alone.
+        key = max(shared, key=lambda k: counts[k]) if shared else ("__solo__", i)
+        clusters.setdefault(key, []).append(o)
+
+    def cap(o):
+        return o.capturable if o.capturable is not None else -1
+
+    out = []
+    for key, opps in clusters.items():
+        opps.sort(key=cap, reverse=True)
+        shared_key = key if not (isinstance(key, tuple) and key[0] == "__solo__") else None
+        out.append((shared_key, opps))
+    out.sort(key=lambda c: cap(c[1][0]), reverse=True)
+    return out
+
+
+def _opp_row(o, extra_flags=""):
+    legs = "<br/>".join(
+        "%s &middot; <a href='%s'>%s</a> @ %.3f <span class='pill'>%s</span>" % (
+            html.escape(l.action), html.escape(l.contract.url),
+            html.escape(l.contract.title), l.price, l.contract.platform)
+        for l in o.legs)
+    edge_class = "up" if o.net_edge >= MARGINAL_EDGE else "warn"
+    marginal = "" if o.net_edge >= MARGINAL_EDGE else "<div class='muted'>marginal</div>"
+    flags = []
+    if o.expiring_soon:
+        flags.append("<span class='down'>expires &lt;48h</span>")
+    flags.extend("<div class='muted'>%s</div>" % html.escape(c) for c in o.caveats)
+    if extra_flags:
+        flags.append(extra_flags)
+
+    thin = o.max_contracts is not None and o.max_contracts == 0
+    size_cell = ("<span class='down'>thin book</span>" if thin
+                 else "<span class='num-cell'>%s</span>" % _fmt_size(o.max_contracts))
+    cap_class = "up" if (o.capturable or 0) > 0 else "warn"
+    cap_cell = "<span class='edge %s'>%s</span>" % (cap_class, _fmt_money(o.capturable))
+
+    return (
+        "<tr class='divider'><td><span class='pill'>%s</span></td><td>%s</td>"
+        "<td>%s</td><td>%s</td>"
+        "<td class='edge %s'>$%.4f%s<br/><span class='muted'>gross $%.4f &middot; "
+        "fees $%.4f</span></td><td>%s<br/>%s</td></tr>"
+        % (o.kind, legs, cap_cell, size_cell,
+           edge_class, o.net_edge, marginal, o.gross_edge, o.fees,
+           _when(o.expires_at), "".join(flags)))
+
+
+def _variant_note(primary, variants, shared_key):
+    """Caveat + compact list of the other opportunities sharing primary's leg."""
+    shared_leg = next(l for l in primary.legs if _leg_key(l) == shared_key)
+    depth = None
+    for leg, d in zip(primary.legs, primary.leg_depths or []):
+        if _leg_key(leg) == shared_key:
+            depth = d
+    depth_str = _fmt_size(depth) if depth is not None else "one"
+    caveat = (
+        "<div class='muted'>Shares the %s %s leg with %d other variant(s) &mdash; one "
+        "%s-contract book fills across all of them, so these capturables are "
+        "<strong>not additive</strong>.</div>"
+        % (html.escape(_short_title(shared_leg.contract.title)),
+           html.escape(shared_leg.action), len(variants), depth_str))
+    items = []
+    for v in variants:
+        # Show the *differing* leg in full - the strike is what distinguishes
+        # these variants, and it lives after the "—" that _short_title trims.
+        other = [l for l in v.legs if _leg_key(l) != shared_key] or v.legs
+        desc = ", ".join(
+            "%s %s @ %.3f" % (html.escape(l.action),
+                              html.escape(l.contract.title), l.price)
+            for l in other)
+        items.append(
+            "<li>%s &mdash; %s, net $%.4f</li>"
+            % (desc, _fmt_money(v.capturable), v.net_edge))
+    return caveat, "<ul class='variants'>%s</ul>" % "".join(items)
+
+
 def _opportunity_rows(opportunities):
     if not opportunities:
         return ("<p class='empty'>No opportunities with a positive net edge right now. "
                 "That is the normal state - real arbitrage is rare and small. The scan "
                 "keeps running every 30 minutes.</p>")
     rows = []
-    for o in opportunities:
-        legs = "<br/>".join(
-            "%s &middot; <a href='%s'>%s</a> @ %.3f <span class='pill'>%s</span>" % (
-                html.escape(l.action), html.escape(l.contract.url),
-                html.escape(l.contract.title), l.price, l.contract.platform)
-            for l in o.legs)
-        edge_class = "up" if o.net_edge >= MARGINAL_EDGE else "warn"
-        marginal = "" if o.net_edge >= MARGINAL_EDGE else "<div class='muted'>marginal</div>"
-        flags = []
-        if o.expiring_soon:
-            flags.append("<span class='down'>expires &lt;48h</span>")
-        flags.extend("<div class='muted'>%s</div>" % html.escape(c) for c in o.caveats)
-
-        thin = o.max_contracts is not None and o.max_contracts == 0
-        size_cell = ("<span class='down'>thin book</span>" if thin
-                     else "<span class='num-cell'>%s</span>" % _fmt_size(o.max_contracts))
-        cap_class = "up" if (o.capturable or 0) > 0 else "warn"
-        cap_cell = "<span class='edge %s'>%s</span>" % (cap_class, _fmt_money(o.capturable))
-
+    for shared_key, cluster in _cluster_opportunities(opportunities):
+        primary = cluster[0]
+        if shared_key is None or len(cluster) == 1:
+            rows.append(_opp_row(primary))
+            continue
+        caveat, variant_list = _variant_note(primary, cluster[1:], shared_key)
+        rows.append(_opp_row(primary, extra_flags=caveat))
         rows.append(
-            "<tr class='divider'><td><span class='pill'>%s</span></td><td>%s</td>"
-            "<td>%s</td><td>%s</td>"
-            "<td class='edge %s'>$%.4f%s<br/><span class='muted'>gross $%.4f &middot; "
-            "fees $%.4f</span></td><td>%s<br/>%s</td></tr>"
-            % (o.kind, legs, cap_cell, size_cell,
-               edge_class, o.net_edge, marginal, o.gross_edge, o.fees,
-               _when(o.expires_at), "".join(flags)))
+            "<tr class='variant-row'><td></td><td colspan='5'>"
+            "<span class='muted'>Other variants on the same leg (shown above is best):"
+            "</span>%s</td></tr>" % variant_list)
     return ("<div class='tablewrap'><table><tr><th>Type</th><th>Trades (per $1 contract)"
             "</th><th>Capturable</th><th>Max size</th><th>Net edge</th>"
             "<th>Resolves by</th></tr>%s</table></div>" % "".join(rows))
 
 
+def _event_group_label(sample):
+    """Named header for an event group: platform · event name · type · window."""
+    kind = "settle" if sample.semantics.startswith("SETTLE") else (
+        "touch" if sample.semantics.startswith("TOUCH") else "direction")
+    name = sample.event_title or sample.event_id
+    return ("<span class='gh-plat'>%s</span> &middot; %s &middot; %s &middot; ends %s" % (
+        html.escape(sample.platform.capitalize()), html.escape(name),
+        kind, _relative(sample.window_end)))
+
+
 def _contracts_table(contracts):
     contracts = sorted(
         contracts,
-        key=lambda c: (c.underlying, c.window_end or "", c.platform,
+        key=lambda c: (c.underlying, c.window_end or "", c.platform, c.event_id,
                        c.threshold_low or c.threshold_high or 0))
     rows = []
-    prev_group = None
+    prev_event = None
     for c in contracts:
-        group = (c.underlying, c.window_end)
-        divider = " class='divider'" if group != prev_group and prev_group else ""
-        prev_group = group
+        if c.event_id != prev_event:
+            rows.append("<tr class='group-head'><td colspan='7'>%s</td></tr>"
+                        % _event_group_label(c))
+            prev_event = c.event_id
         threshold = c.threshold_low if c.threshold_low is not None else c.threshold_high
         semantics = c.semantics.replace("_", " ").lower()
         stale = "" if c.has_quotes() else " <span class='down'>(no book)</span>"
         rows.append(
-            "<tr%s><td><span class='pill'>%s</span></td><td>%s</td><td>%s</td>"
+            "<tr><td><span class='pill'>%s</span></td><td>%s</td><td>%s</td>"
             "<td>%s</td><td>%s / %s%s</td><td class='muted'>%s</td>"
             "<td><a href='%s'>open</a></td></tr>"
-            % (divider, c.platform, c.underlying.replace("_", " "),
+            % (c.platform, c.underlying.replace("_", " "),
                html.escape(semantics),
                "-" if threshold is None else "$%s" % format(int(threshold), ","),
                _fmt_pct(c.yes_bid), _fmt_pct(c.yes_ask), stale,
