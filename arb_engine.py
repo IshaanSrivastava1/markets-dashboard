@@ -24,8 +24,13 @@ buy-all-YES (asks sum < $1) and buy-all-NO (asks sum < $n-1).
 
 Fees: Kalshi taker fee = 0.07 * P * (1-P) per contract (per-order round-up
 to the cent is ignored; add ~1c per order when acting on tiny edges).
-Polymarket charges no trading fee. Slippage beyond top-of-book is not
-modeled - flagged sizes must be checked against book depth before trading.
+Polymarket charges no trading fee.
+
+Sizing: size_opportunities() adds a maximum realistic position from live
+order-book depth (top-of-book: the smallest per-leg size available at the
+flagged price) and the resulting total capturable profit. Deeper book levels
+price worse, so they are not counted - the flagged edge holds for every
+contract in the sized position.
 """
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
@@ -69,6 +74,10 @@ class Opportunity:
     expires_at: Optional[str]
     expiring_soon: bool
     caveats: List[str] = field(default_factory=list)
+    # Populated by size_opportunities() once order books are available:
+    max_contracts: Optional[float] = None  # sets executable at the flagged price
+    capturable: Optional[float] = None     # net_edge * max_contracts (dollars)
+    leg_depths: List[Optional[float]] = field(default_factory=list)  # per-leg top size
 
 
 def _parse_iso(value):
@@ -310,16 +319,53 @@ def find_opportunities(contracts, min_net_edge=0.0):
     return opportunities
 
 
+# --------------------------------------------------------------- sizing
+
+
+def _top_size(ladder):
+    """Contracts available at the best (cheapest) ask, 0 for an empty book."""
+    return ladder[0][1] if ladder else 0.0
+
+
+def size_opportunities(opportunities, ladder_provider):
+    """Fill in max_contracts / capturable / leg_depths for each opportunity
+    from order-book depth. `ladder_provider(leg)` returns that leg's ask ladder
+    (list of (price, size), cheapest first) or [] if unavailable.
+
+    Top-of-book model: every leg must buy one contract per set, so the number
+    of sets executable at the flagged price is the smallest per-leg top-of-book
+    size. Pure: all network lives in the injected provider."""
+    for o in opportunities:
+        depths = [_top_size(ladder_provider(leg)) for leg in o.legs]
+        o.leg_depths = depths
+        o.max_contracts = min(depths) if depths else 0.0
+        o.capturable = round(o.net_edge * o.max_contracts, 2)
+    return opportunities
+
+
+def rank_by_capturable(opportunities):
+    """Ranked by total capturable profit (largest first), net edge as the
+    tiebreaker. Unsized opportunities (capturable is None) sort last."""
+    return sorted(
+        opportunities,
+        key=lambda o: (o.capturable if o.capturable is not None else -1, o.net_edge),
+        reverse=True,
+    )
+
+
 if __name__ == "__main__":
-    from arb_sources import fetch_all_contracts
+    from arb_sources import fetch_all_contracts, fetch_ask_ladder
 
     found = find_opportunities(fetch_all_contracts())
+    size_opportunities(found, lambda leg: fetch_ask_ladder(leg.contract, leg.action))
+    found = rank_by_capturable(found)
     if not found:
         print("No opportunities with positive net edge right now.")
     for opp in found:
-        print("[%s] net edge $%.4f/contract (gross %.4f, fees %.4f)%s"
-              % (opp.kind, opp.net_edge, opp.gross_edge, opp.fees,
-                 "  EXPIRING <48h" if opp.expiring_soon else ""))
+        print("[%s] capturable $%.2f  (net edge $%.4f/contract x %s, fees %.4f)%s"
+              % (opp.kind, opp.capturable or 0, opp.net_edge,
+                 "%.0f" % opp.max_contracts if opp.max_contracts is not None else "?",
+                 opp.fees, "  EXPIRING <48h" if opp.expiring_soon else ""))
         print("   " + opp.description)
         for caveat in opp.caveats:
             print("   caveat: " + caveat)

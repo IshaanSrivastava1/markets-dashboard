@@ -257,5 +257,76 @@ class FeeMathTest(unittest.TestCase):
         self.assertEqual(kalshi_fee(1.0), 0.0)
 
 
+class SizingTest(unittest.TestCase):
+    def _ladder_arb(self):
+        # One ladder violation: BUY YES hit8k @0.038 + BUY NO hit12k @0.960.
+        low = make_contract("hit8k", threshold=8000, yes_bid=0.031, yes_ask=0.038)
+        high = make_contract("hit12k", threshold=12000, yes_bid=0.040, yes_ask=0.041)
+        return find_opportunities([low, high])
+
+    def _provider(self, sizes):
+        """Ladder provider keyed by (market_id, action) -> top-of-book size."""
+        def provider(leg):
+            size = sizes.get((leg.contract.market_id, leg.action))
+            return [(leg.price, size)] if size is not None else []
+        return provider
+
+    def test_min_depth_and_capturable(self):
+        opps = self._ladder_arb()
+        arb_engine.size_opportunities(opps, self._provider({
+            ("hit8k", "BUY YES"): 500.0,
+            ("hit12k", "BUY NO"): 120.0,
+        }))
+        o = opps[0]
+        self.assertEqual(sorted(o.leg_depths), [120.0, 500.0])
+        self.assertEqual(o.max_contracts, 120.0)  # the thinner leg caps the set
+        self.assertAlmostEqual(o.capturable, round(o.net_edge * 120.0, 2), places=6)
+
+    def test_empty_book_leg_zeroes_position(self):
+        opps = self._ladder_arb()
+        arb_engine.size_opportunities(opps, self._provider({
+            ("hit8k", "BUY YES"): 500.0,
+            # hit12k NO book missing -> empty ladder
+        }))
+        self.assertEqual(opps[0].max_contracts, 0.0)
+        self.assertEqual(opps[0].capturable, 0.0)
+
+    def test_rank_by_capturable_beats_edge(self):
+        # Small edge x deep book should outrank a bigger edge on a 1-lot book.
+        # Two independent pairs (different underlyings so they can't cross-pair).
+        big_a = make_contract("A", threshold=8000, yes_bid=0.031, yes_ask=0.038)
+        big_b = make_contract("B", threshold=12000, yes_bid=0.100, yes_ask=0.110)
+        small_a = make_contract("C", threshold=9000, yes_bid=0.050, yes_ask=0.056,
+                                event_id="ev2", underlying="GC_FUTURES")
+        small_b = make_contract("D", threshold=13000, yes_bid=0.058, yes_ask=0.059,
+                                event_id="ev2", underlying="GC_FUTURES")
+        opps = find_opportunities([big_a, big_b, small_a, small_b])
+        self.assertEqual(len(opps), 2)
+        by_edge = sorted(opps, key=lambda o: o.net_edge, reverse=True)
+        big, small = by_edge[0], by_edge[1]
+        self.assertGreater(big.net_edge, small.net_edge)
+        # Give the smaller-edge pair a much deeper book, the bigger edge 1 lot.
+        sizes = {}
+        for leg in small.legs:
+            sizes[(leg.contract.market_id, leg.action)] = 10000.0
+        for leg in big.legs:
+            sizes[(leg.contract.market_id, leg.action)] = 1.0
+        arb_engine.size_opportunities(opps, self._provider(sizes))
+        ranked = arb_engine.rank_by_capturable(opps)
+        self.assertGreater(ranked[0].capturable, ranked[1].capturable)
+        self.assertEqual(ranked[0].net_edge, small.net_edge)  # deeper book wins
+
+    def test_unsized_opportunities_sort_last(self):
+        opps = self._ladder_arb()  # not sized -> capturable is None
+        ranked = arb_engine.rank_by_capturable(opps)
+        self.assertIsNone(ranked[0].capturable)  # doesn't raise, sorts by None
+
+    def test_missing_provider_entry_degrades(self):
+        opps = self._ladder_arb()
+        # Provider always returns [] -> size 0, no exception.
+        arb_engine.size_opportunities(opps, lambda leg: [])
+        self.assertEqual(opps[0].max_contracts, 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()

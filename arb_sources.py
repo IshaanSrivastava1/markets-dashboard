@@ -62,6 +62,7 @@ class Contract:
     volume_24h: Optional[float]
     mutually_exclusive: bool          # true if the event's markets form exclusive brackets
     fetched_at: str
+    token_ids: Optional[list] = None  # Polymarket [yesToken, noToken]; None for Kalshi
 
     def has_quotes(self):
         """True if there is a real two-sided book (not an empty 0-bid/1-ask shell)."""
@@ -142,6 +143,10 @@ def fetch_polymarket_contracts():
             except (ValueError, IndexError, TypeError):
                 pass
             end_date = m.get("endDate") or event.get("endDate")
+            try:
+                token_ids = json.loads(m.get("clobTokenIds") or "null")
+            except (ValueError, TypeError):
+                token_ids = None
             contracts.append(Contract(
                 platform="polymarket",
                 market_id=str(m.get("id")),
@@ -165,6 +170,7 @@ def fetch_polymarket_contracts():
                 volume_24h=_to_float(m.get("volume24hr")),
                 mutually_exclusive=mutually_exclusive,
                 fetched_at=fetched_at,
+                token_ids=token_ids,
             ))
     if skipped:
         print("[polymarket] skipped %d non-price market(s): %s"
@@ -286,6 +292,50 @@ def fetch_kalshi_contracts():
 
 def fetch_all_contracts():
     return fetch_polymarket_contracts() + fetch_kalshi_contracts()
+
+
+# ------------------------------------------------------- order-book depth
+
+CLOB_BOOK_URL = "https://clob.polymarket.com/book"
+
+
+def _kalshi_ask_ladder(ticker, action):
+    """Ask ladder (best price first) for one side of a Kalshi market. Kalshi's
+    orderbook lists resting *bids*; the ask you take is the complement of the
+    opposite side's bids (a NO bid at p offers YES at 1-p, and vice-versa)."""
+    book = _kalshi_get("/markets/%s/orderbook" % ticker).get("orderbook_fp") or {}
+    opposite = book.get("no_dollars" if action == "BUY YES" else "yes_dollars") or []
+    # opposite is ascending by bid price; highest bid = cheapest ask for us.
+    ladder = [(round(1 - float(price), 4), float(size))
+              for price, size in opposite]
+    ladder.sort(key=lambda level: level[0])
+    return ladder
+
+
+def _polymarket_ask_ladder(token_ids, action):
+    """Ask ladder (best price first) for one side of a Polymarket market:
+    the asks of the YES token (BUY YES) or the NO token (BUY NO)."""
+    if not token_ids or len(token_ids) < 2:
+        return []
+    token = token_ids[0] if action == "BUY YES" else token_ids[1]
+    data = _get_json("%s?token_id=%s" % (CLOB_BOOK_URL, token))
+    ladder = [(float(level["price"]), float(level["size"]))
+              for level in (data.get("asks") or [])]
+    ladder.sort(key=lambda level: level[0])
+    return ladder
+
+
+def fetch_ask_ladder(contract, action):
+    """Executable ask ladder (list of (price, size), cheapest first) for buying
+    `action` ("BUY YES" | "BUY NO") of `contract`. Prices are probability
+    dollars. Returns [] on any failure or empty book (best-effort)."""
+    try:
+        if contract.platform == "kalshi":
+            return _kalshi_ask_ladder(contract.market_id, action)
+        return _polymarket_ask_ladder(contract.token_ids, action)
+    except Exception as exc:
+        print("[book] %s %s failed: %s" % (contract.platform, contract.market_id, exc))
+        return []
 
 
 def _fmt(value):

@@ -74,6 +74,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
       font-size: 0.78rem; border: 1px solid #333; color: #aaa; white-space: nowrap;
     }}
     .edge {{ font-size: 1.05rem; font-weight: 700; }}
+    .num-cell {{ font-variant-numeric: tabular-nums; }}
     a {{ color: #60a5fa; }}
     .empty {{ color: #888; padding: 12px 0; }}
     footer {{ max-width: 1100px; margin: 0 auto; padding: 8px 20px 40px; color: #666; font-size: 0.85rem; }}
@@ -106,7 +107,10 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
       to hit $10,000 first, so "hit $10,000" can never be worth less than "hit $12,000".
       When the combined price of such a set drops below its guaranteed payout, that gap is
       the edge. Kalshi taker fees (0.07&times;P&times;(1&minus;P) per contract) are already
-      subtracted; Polymarket charges no trading fee.</p>
+      subtracted; Polymarket charges no trading fee. <strong>Capturable</strong> is the edge
+      times how many contracts are actually available at that price in the live order book
+      (the thinner leg caps the position) &mdash; rows are ranked by it, so a small edge on a
+      deep book can outrank a big edge you could only fill once.</p>
       {opportunities}
     </section>
     <section>
@@ -148,6 +152,19 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 
 def _fmt_pct(value):
     return "-" if value is None else "%.1f%%" % (value * 100)
+
+
+def _fmt_size(value):
+    """Contract count: '1,256' or '-' / '0' (thin book)."""
+    if value is None:
+        return "-"
+    return "{:,.0f}".format(value)
+
+
+def _fmt_money(value):
+    if value is None:
+        return "-"
+    return "${:,.2f}".format(value)
 
 
 def _relative(iso_str):
@@ -196,15 +213,18 @@ def _history_rows(opportunities, limit=10):
         absolute = seen[:16].replace("T", " ") + " UTC"
         badge = (" <span class='pill up'>still open</span>"
                  if e.get("fingerprint") in open_now else "")
+        cap = e.get("capturable", "")
+        cap_cell = ("$%s" % cap) if cap not in ("", None) else "-"  # blank on pre-sizing rows
         rows.append(
             "<tr class='divider'><td><span title='%s'>%s</span></td>"
-            "<td><span class='pill'>%s</span></td><td>$%s%s</td>"
+            "<td><span class='pill'>%s</span></td><td>%s</td><td>$%s%s</td>"
             "<td class='muted'>%s</td></tr>"
             % (html.escape(absolute), _ago(seen), html.escape(e.get("kind", "-")),
-               html.escape(e.get("net_edge", "-")), badge,
+               html.escape(cap_cell), html.escape(e.get("net_edge", "-")), badge,
                html.escape(e.get("description", ""))))
     return ("<div class='tablewrap'><table><tr><th>First seen</th><th>Type</th>"
-            "<th>Net edge</th><th>What</th></tr>%s</table></div>" % "".join(rows))
+            "<th>Capturable</th><th>Net edge</th><th>What</th></tr>%s</table></div>"
+            % "".join(rows))
 
 
 def _when(iso_str):
@@ -217,12 +237,13 @@ def _when(iso_str):
 
 def _tiles(contracts, opportunities):
     live = sum(1 for c in contracts if c.has_quotes())
-    best = ("$%.4f" % opportunities[0].net_edge) if opportunities else "&mdash;"
+    caps = [o.capturable for o in opportunities if o.capturable is not None]
+    best = _fmt_money(max(caps)) if caps else "&mdash;"
     tiles = [
         ("%d" % len(contracts), "contracts scanned"),
         ("%d" % live, "with live books"),
         ("%d" % len(opportunities), "opportunities now"),
-        (best, "best net edge / contract"),
+        (best, "best capturable profit"),
     ]
     return "".join(
         "<div class='tile'><div class='num'>%s</div><div class='lab'>%s</div></div>"
@@ -329,16 +350,24 @@ def _opportunity_rows(opportunities):
         if o.expiring_soon:
             flags.append("<span class='down'>expires &lt;48h</span>")
         flags.extend("<div class='muted'>%s</div>" % html.escape(c) for c in o.caveats)
+
+        thin = o.max_contracts is not None and o.max_contracts == 0
+        size_cell = ("<span class='down'>thin book</span>" if thin
+                     else "<span class='num-cell'>%s</span>" % _fmt_size(o.max_contracts))
+        cap_class = "up" if (o.capturable or 0) > 0 else "warn"
+        cap_cell = "<span class='edge %s'>%s</span>" % (cap_class, _fmt_money(o.capturable))
+
         rows.append(
             "<tr class='divider'><td><span class='pill'>%s</span></td><td>%s</td>"
-            "<td class='edge %s'>$%.4f%s</td><td>%s<br/><span class='muted'>fees $%.4f"
-            "</span></td><td>%s<br/>%s</td></tr>"
-            % (o.kind, legs, edge_class, o.net_edge, marginal,
-               "$%.4f" % o.gross_edge, o.fees,
+            "<td>%s</td><td>%s</td>"
+            "<td class='edge %s'>$%.4f%s<br/><span class='muted'>gross $%.4f &middot; "
+            "fees $%.4f</span></td><td>%s<br/>%s</td></tr>"
+            % (o.kind, legs, cap_cell, size_cell,
+               edge_class, o.net_edge, marginal, o.gross_edge, o.fees,
                _when(o.expires_at), "".join(flags)))
     return ("<div class='tablewrap'><table><tr><th>Type</th><th>Trades (per $1 contract)"
-            "</th><th>Net edge</th><th>Gross / fees</th><th>Resolves by</th></tr>%s"
-            "</table></div>" % "".join(rows))
+            "</th><th>Capturable</th><th>Max size</th><th>Net edge</th>"
+            "<th>Resolves by</th></tr>%s</table></div>" % "".join(rows))
 
 
 def _contracts_table(contracts):
@@ -384,11 +413,13 @@ def _write_csvs(opportunities, now_iso):
             previous = {row["fingerprint"] for row in csv.DictReader(f)}
 
     fields = ["seen_at", "fingerprint", "kind", "net_edge", "gross_edge", "fees",
-              "expires_at", "description"]
+              "max_contracts", "capturable", "expires_at", "description"]
 
     def row(o):
         return {"seen_at": now_iso, "fingerprint": _fingerprint(o), "kind": o.kind,
                 "net_edge": o.net_edge, "gross_edge": o.gross_edge, "fees": o.fees,
+                "max_contracts": o.max_contracts if o.max_contracts is not None else "",
+                "capturable": o.capturable if o.capturable is not None else "",
                 "expires_at": o.expires_at or "", "description": o.description}
 
     CURRENT_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -399,13 +430,53 @@ def _write_csvs(opportunities, now_iso):
 
     new = [o for o in opportunities if _fingerprint(o) not in previous]
     if new:
-        write_header = not LOG_FILE.exists()
-        with LOG_FILE.open("a", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fields)
-            if write_header:
-                writer.writeheader()
-            writer.writerows(row(o) for o in new)
+        _append_log(new, fields, row)
     return len(new)
+
+
+def _append_log(new_opportunities, fields, row):
+    """Append new sightings to the log. If the log predates a column (the
+    schema has grown over time), rewrite it with the new header first so old
+    and new rows stay aligned."""
+    old_rows = []
+    needs_migration = False
+    if LOG_FILE.exists():
+        with LOG_FILE.open(newline="") as f:
+            reader = csv.DictReader(f)
+            if reader.fieldnames != fields:
+                needs_migration = True
+                old_rows = list(reader)
+
+    if needs_migration:
+        with LOG_FILE.open("w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
+            writer.writeheader()
+            for r in old_rows:
+                writer.writerow({k: r.get(k, "") for k in fields})
+            writer.writerows(row(o) for o in new_opportunities)
+        return
+
+    with LOG_FILE.open("a", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fields)
+        if not old_rows and LOG_FILE.stat().st_size == 0:
+            writer.writeheader()
+        writer.writerows(row(o) for o in new_opportunities)
+
+
+def _cached_ladder_provider():
+    """Order-book provider that fetches each distinct leg once (deduped by
+    platform/market/side). Only the legs of flagged opportunities are ever
+    passed in, so this stays a handful of calls per run."""
+    cache = {}
+
+    def provider(leg):
+        key = (leg.contract.platform, leg.contract.market_id, leg.action)
+        if key not in cache:
+            cache[key] = arb_sources.fetch_ask_ladder(leg.contract, leg.action)
+        return cache[key]
+
+    provider.cache = cache
+    return provider
 
 
 def main():
@@ -413,6 +484,13 @@ def main():
     opportunities = arb_engine.find_opportunities(contracts)
     now = datetime.now(timezone.utc)
     now_iso = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    # Size each opportunity against live order-book depth, then rank by total
+    # capturable profit rather than per-contract edge.
+    provider = _cached_ladder_provider()
+    arb_engine.size_opportunities(opportunities, provider)
+    opportunities = arb_engine.rank_by_capturable(opportunities)
+    print("[book] fetched %d distinct leg book(s)" % len(provider.cache))
 
     # Log first so this run's new sightings appear in its own history section.
     new_count = _write_csvs(opportunities, now_iso)
