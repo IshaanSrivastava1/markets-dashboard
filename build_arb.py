@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gold arbitrage tracker (V3.5) - page builder.
+"""Gold arbitrage tracker (V3.6) - page builder.
 
 Entry point for the 30-minute GitHub Actions workflow (arb.yml). Fetches all
 live gold contracts from Polymarket + Kalshi (arb_sources), runs the detection
@@ -21,7 +21,7 @@ from plotly.subplots import make_subplots
 import arb_engine
 import arb_sources
 from arb_engine import _parse_iso
-from arb_sources import GC_FUTURES, SETTLE_ABOVE, TOUCH_HIGH, TOUCH_LOW
+from arb_sources import GC_FUTURES, SETTLE_ABOVE, SETTLE_BELOW, TOUCH_HIGH, TOUCH_LOW
 
 BASE_DIR = Path(__file__).resolve().parent
 OUT_FILE = BASE_DIR / "docs" / "arb.html"
@@ -39,6 +39,19 @@ LADDER_COLORS = ["#3b82f6", "#ef4444", "#0891b2", "#d97706",
 # Newest first. A hand-maintained record of what shipped on this page - not
 # derived from git history, so it can explain *why* in plain language.
 CHANGELOG = [
+    {
+        "version": "v3.6", "date": "2026-07-12",
+        "title": "Cleaner opportunity cards",
+        "tags": ["card layout", "link buttons", "less clutter"],
+        "description": (
+            "Redesigned the live opportunities from a dense table into clean "
+            "cards: each trade leg is a concise one-line proposition with a "
+            "button straight to its market. Dropped the noisy extras "
+            "(settlement-source basis-risk notes, the 'not additive' caveat, and "
+            "the gross/fee breakdown — now a hover tooltip), and near-duplicate "
+            "variants are summarized as a count instead of a full sublist."
+        ),
+    },
     {
         "version": "v3.5", "date": "2026-07-12",
         "title": "Freshness & clarity",
@@ -167,9 +180,32 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     .change-date {{ color: #666; font-weight: 400; font-size: 0.85rem; }}
     .change-entry p {{ margin: 0 0 8px; color: #aaa; font-size: 0.92rem; max-width: 68ch; }}
     .change-tags {{ display: flex; flex-wrap: wrap; gap: 6px; }}
-    .variant-row td {{ padding-top: 0; }}
-    ul.variants {{ margin: 4px 0 2px; padding-left: 18px; color: #aaa; font-size: 0.88rem; }}
-    ul.variants li {{ margin: 2px 0; }}
+    .opp-list {{ display: flex; flex-direction: column; gap: 14px; margin-top: 12px; }}
+    .opp-card {{ background: #0d0d0d; border: 1px solid #222; border-radius: 12px; padding: 16px 18px; }}
+    .opp-top {{ display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }}
+    .cap-num {{ font-size: 1.55rem; font-weight: 700; line-height: 1; }}
+    .cap-lab {{ display: block; color: #888; font-size: 0.72rem; text-align: right; margin-top: 2px; }}
+    .opp-legs {{ display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }}
+    .leg {{ display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }}
+    .side {{
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em;
+      padding: 2px 8px; border-radius: 6px; white-space: nowrap;
+    }}
+    .side-yes {{ background: #0f2e1f; color: #34d399; }}
+    .side-no {{ background: #2e1516; color: #f87171; }}
+    .leg-desc {{ flex: 1; min-width: 220px; }}
+    .btn {{
+      border: 1px solid #333; border-radius: 8px; padding: 4px 12px;
+      font-size: 0.82rem; color: #cfe0f5; background: #141a24;
+      text-decoration: none; white-space: nowrap;
+    }}
+    .btn:hover {{ border-color: #3b82f6; }}
+    .btn:focus-visible {{ outline: 2px solid #3b82f6; outline-offset: 2px; }}
+    .opp-stats {{
+      display: flex; flex-wrap: wrap; gap: 8px 18px; color: #888; font-size: 0.88rem;
+      border-top: 1px solid #1c1c1c; padding-top: 10px;
+    }}
+    .opp-stats b {{ color: #e5e5e5; font-weight: 600; font-variant-numeric: tabular-nums; }}
     tr.group-head td {{
       background: #161616; font-weight: 700; font-size: 0.85rem;
       letter-spacing: 0.02em; padding: 8px 12px; border-top: 1px solid #222;
@@ -186,7 +222,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
   <header>
-    <h1>Gold Arbitrage Tracker <span class="muted">V3.5</span></h1>
+    <h1>Gold Arbitrage Tracker <span class="muted">V3.6</span></h1>
     <p>Polymarket &times; Kalshi &middot; refreshed every 30 minutes via GitHub Actions &middot;
        last updated <span id="freshness" data-updated="{updated_iso}">{updated} UTC</span>
        &middot; <a href="index.html">back to dashboard</a></p>
@@ -196,17 +232,15 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   <main>
     <section>
       <h2>Live opportunities</h2>
-      <p class="explain">Each row is a set of trades that logically <em>cannot</em> pay out
+      <p class="explain">Each card is a set of trades that logically <em>cannot</em> pay out
       less than its guaranteed amount at resolution: e.g. gold hitting $12,000 requires it
       to hit $10,000 first, so "hit $10,000" can never be worth less than "hit $12,000".
       When the combined price of such a set drops below its guaranteed payout, that gap is
       the edge. Kalshi taker fees (0.07&times;P&times;(1&minus;P) per contract) are already
       subtracted; Polymarket charges no trading fee. <strong>Capturable</strong> is the edge
       times how many contracts are actually available at that price in the live order book
-      (the thinner leg caps the position) &mdash; rows are ranked by it, so a small edge on a
-      deep book can outrank a big edge you could only fill once. Opportunities that reuse the
-      same leg against different strikes are grouped (best shown, the rest listed underneath)
-      since they draw on one shared order book.</p>
+      (the thinner leg caps the position) &mdash; cards are ranked by it, so a small edge on a
+      deep book can outrank a big edge you could only fill once.</p>
       {opportunities}
     </section>
     <section>
@@ -510,64 +544,69 @@ def _cluster_opportunities(opportunities):
     return out
 
 
-def _opp_row(o, extra_flags=""):
-    legs = "<br/>".join(
-        "%s &middot; <a href='%s'>%s</a> @ %.3f <span class='pill'>%s</span>" % (
-            html.escape(l.action), html.escape(l.contract.url),
-            html.escape(l.contract.title), l.price, l.contract.platform)
-        for l in o.legs)
-    edge_class = "up" if o.net_edge >= MARGINAL_EDGE else "warn"
-    marginal = "" if o.net_edge >= MARGINAL_EDGE else "<div class='muted'>marginal</div>"
-    flags = []
-    if o.expiring_soon:
-        flags.append("<span class='down'>expires &lt;48h</span>")
-    flags.extend("<div class='muted'>%s</div>" % html.escape(c) for c in o.caveats)
-    if extra_flags:
-        flags.append(extra_flags)
+_LEG_VERB = {
+    TOUCH_HIGH: "hits", TOUCH_LOW: "drops to",
+    SETTLE_ABOVE: "settles ≥", SETTLE_BELOW: "settles <",
+}
 
-    thin = o.max_contracts is not None and o.max_contracts == 0
-    size_cell = ("<span class='down'>thin book</span>" if thin
-                 else "<span class='num-cell'>%s</span>" % _fmt_size(o.max_contracts))
+
+def _leg_label(leg):
+    """Concise proposition for one market leg, e.g. 'Gold hits $4,600 · XAUUSD · by Jul 31'.
+    Returns an HTML-escaped string ('<' in 'settles <' becomes &lt;)."""
+    c = leg.contract
+    threshold = c.threshold_low if c.threshold_low is not None else c.threshold_high
+    verb = _LEG_VERB.get(c.semantics)
+    if verb is None or threshold is None:
+        return html.escape(_short_title(c.title))
+    underlying = "GC" if c.underlying == GC_FUTURES else "XAUUSD"
+    end = _parse_iso(c.window_end)
+    when = end.strftime("%b %-d") if end else ""
+    is_touch = c.semantics in (TOUCH_HIGH, TOUCH_LOW)
+    parts = ["Gold %s $%s" % (verb, format(int(threshold), ",")), underlying]
+    if when:
+        parts.append(("by %s" if is_touch else "%s") % when)
+    return html.escape(" · ".join(parts))
+
+
+def _leg_line(leg):
+    side_cls = "side-yes" if leg.action == "BUY YES" else "side-no"
+    return (
+        "<div class='leg'><span class='side %s'>%s</span>"
+        "<span class='leg-desc'>%s <span class='muted'>@ %.3f</span></span>"
+        "<a class='btn' href='%s'>%s &#8599;</a></div>"
+        % (side_cls, html.escape(leg.action), _leg_label(leg), leg.price,
+           html.escape(leg.contract.url), html.escape(leg.contract.platform.capitalize())))
+
+
+def _opportunity_card(o, variant_count=0):
     cap_class = "up" if (o.capturable or 0) > 0 else "warn"
-    cap_cell = "<span class='edge %s'>%s</span>" % (cap_class, _fmt_money(o.capturable))
+    edge_class = "up" if o.net_edge >= MARGINAL_EDGE else "warn"
+    legs = "".join(_leg_line(l) for l in o.legs)
+
+    stats = [
+        "Max size <b>%s</b>" % (
+            "<span class='down'>thin book</span>"
+            if (o.max_contracts is not None and o.max_contracts == 0)
+            else _fmt_size(o.max_contracts)),
+        "Net edge <b class='%s' title='gross $%.4f &middot; fees $%.4f'>$%.4f</b>"
+        % (edge_class, o.gross_edge, o.fees, o.net_edge),
+        "Resolves <b>%s</b>" % _when(o.expires_at),
+    ]
+    if o.expiring_soon:
+        stats.append("<span class='down'>expires &lt;48h</span>")
+    if variant_count:
+        stats.append("<span class='muted'>+%d more variant%s on the same leg</span>"
+                     % (variant_count, "" if variant_count == 1 else "s"))
 
     return (
-        "<tr class='divider'><td><span class='pill'>%s</span></td><td>%s</td>"
-        "<td>%s</td><td>%s</td>"
-        "<td class='edge %s'>$%.4f%s<br/><span class='muted'>gross $%.4f &middot; "
-        "fees $%.4f</span></td><td>%s<br/>%s</td></tr>"
-        % (o.kind, legs, cap_cell, size_cell,
-           edge_class, o.net_edge, marginal, o.gross_edge, o.fees,
-           _when(o.expires_at), "".join(flags)))
-
-
-def _variant_note(primary, variants, shared_key):
-    """Caveat + compact list of the other opportunities sharing primary's leg."""
-    shared_leg = next(l for l in primary.legs if _leg_key(l) == shared_key)
-    depth = None
-    for leg, d in zip(primary.legs, primary.leg_depths or []):
-        if _leg_key(leg) == shared_key:
-            depth = d
-    depth_str = _fmt_size(depth) if depth is not None else "one"
-    caveat = (
-        "<div class='muted'>Shares the %s %s leg with %d other variant(s) &mdash; one "
-        "%s-contract book fills across all of them, so these capturables are "
-        "<strong>not additive</strong>.</div>"
-        % (html.escape(_short_title(shared_leg.contract.title)),
-           html.escape(shared_leg.action), len(variants), depth_str))
-    items = []
-    for v in variants:
-        # Show the *differing* leg in full - the strike is what distinguishes
-        # these variants, and it lives after the "—" that _short_title trims.
-        other = [l for l in v.legs if _leg_key(l) != shared_key] or v.legs
-        desc = ", ".join(
-            "%s %s @ %.3f" % (html.escape(l.action),
-                              html.escape(l.contract.title), l.price)
-            for l in other)
-        items.append(
-            "<li>%s &mdash; %s, net $%.4f</li>"
-            % (desc, _fmt_money(v.capturable), v.net_edge))
-    return caveat, "<ul class='variants'>%s</ul>" % "".join(items)
+        "<div class='opp-card'><div class='opp-top'>"
+        "<span class='pill'>%s</span>"
+        "<div><span class='cap-num %s'>%s</span>"
+        "<span class='cap-lab'>capturable</span></div></div>"
+        "<div class='opp-legs'>%s</div>"
+        "<div class='opp-stats'>%s</div></div>"
+        % (o.kind, cap_class, _fmt_money(o.capturable), legs,
+           "".join("<span>%s</span>" % s for s in stats)))
 
 
 def _opportunity_rows(opportunities):
@@ -575,21 +614,9 @@ def _opportunity_rows(opportunities):
         return ("<p class='empty'>No opportunities with a positive net edge right now. "
                 "That is the normal state - real arbitrage is rare and small. The scan "
                 "keeps running every 30 minutes.</p>")
-    rows = []
-    for shared_key, cluster in _cluster_opportunities(opportunities):
-        primary = cluster[0]
-        if shared_key is None or len(cluster) == 1:
-            rows.append(_opp_row(primary))
-            continue
-        caveat, variant_list = _variant_note(primary, cluster[1:], shared_key)
-        rows.append(_opp_row(primary, extra_flags=caveat))
-        rows.append(
-            "<tr class='variant-row'><td></td><td colspan='5'>"
-            "<span class='muted'>Other variants on the same leg (shown above is best):"
-            "</span>%s</td></tr>" % variant_list)
-    return ("<div class='tablewrap'><table><tr><th>Type</th><th>Trades (per $1 contract)"
-            "</th><th>Capturable</th><th>Max size</th><th>Net edge</th>"
-            "<th>Resolves by</th></tr>%s</table></div>" % "".join(rows))
+    cards = [_opportunity_card(cluster[0], variant_count=len(cluster) - 1)
+             for _shared_key, cluster in _cluster_opportunities(opportunities)]
+    return "<div class='opp-list'>%s</div>" % "".join(cards)
 
 
 def _event_group_label(sample):
