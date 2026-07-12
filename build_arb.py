@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gold arbitrage tracker (V3.2) - page builder.
+"""Gold arbitrage tracker (V3.3) - page builder.
 
 Entry point for the 30-minute GitHub Actions workflow (arb.yml). Fetches all
 live gold contracts from Polymarket + Kalshi (arb_sources), runs the detection
@@ -35,6 +35,50 @@ MARGINAL_EDGE = 0.01  # below 1c/contract: real but likely not worth the effort
 # six checks) on #0a0a0a: lightness band, chroma, CVD >= 12, contrast >= 3:1.
 LADDER_COLORS = ["#3b82f6", "#ef4444", "#0891b2", "#d97706",
                  "#8b5cf6", "#059669", "#ec4899"]
+
+# Newest first. A hand-maintained record of what shipped on this page - not
+# derived from git history, so it can explain *why* in plain language.
+CHANGELOG = [
+    {
+        "version": "v3.3", "date": "2026-07-12",
+        "title": "Order-book depth sizing",
+        "tags": ["capturable profit", "order-book depth", "ranking"],
+        "description": (
+            "Each flagged opportunity is now sized against live order-book depth "
+            "(Kalshi's orderbook endpoint, Polymarket's CLOB book) instead of just "
+            "a top-of-book price. The page reports total capturable profit "
+            "(edge x max executable contracts) and ranks opportunities by it, so a "
+            "small edge on a deep book correctly outranks a big edge you could "
+            "only fill once."
+        ),
+    },
+    {
+        "version": "v3.2", "date": "2026-07-05",
+        "title": "Legibility pass, then a bug fix",
+        "tags": ["price-ladder chart", "stat tiles", "relative times",
+                 "Kalshi link fix", "opportunity history"],
+        "description": (
+            "Added a two-panel probability-vs-strike price-ladder chart (solid "
+            "Polymarket / dashed Kalshi lines), an at-a-glance stat-tile summary, "
+            "and human-relative timestamps. Then fixed the Kalshi “open” "
+            "links, which pointed to a guessed URL that dead-ended, and added the "
+            "“Recently spotted” section so visitors see a track record "
+            "of past findings, not just the current instant."
+        ),
+    },
+    {
+        "version": "v3.0", "date": "2026-07-05",
+        "title": "Launch",
+        "tags": ["Polymarket", "Kalshi", "detection engine", "GitHub Actions"],
+        "description": (
+            "First version of the cross-platform gold arbitrage scanner: "
+            "normalizes every open gold-price market on Polymarket and Kalshi "
+            "into one schema, detects logically-guaranteed mispricings with a "
+            "single implication rule (fee-adjusted), and refreshes automatically "
+            "every 30 minutes via GitHub Actions."
+        ),
+    },
+]
 
 PAGE_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -90,11 +134,19 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     }}
     .tile .num {{ font-size: 1.5rem; font-weight: 700; }}
     .tile .lab {{ color: #888; font-size: 0.82rem; }}
+    .changelog {{ display: flex; flex-direction: column; }}
+    .change-entry {{ display: grid; grid-template-columns: 64px 1fr; gap: 18px; padding: 16px 0; }}
+    .change-entry + .change-entry {{ border-top: 1px solid #222; }}
+    .change-version {{ color: #60a5fa; font-weight: 700; font-size: 0.92rem; padding-top: 2px; }}
+    .change-entry h3 {{ margin: 0 0 4px; font-size: 1rem; }}
+    .change-date {{ color: #666; font-weight: 400; font-size: 0.85rem; }}
+    .change-entry p {{ margin: 0 0 8px; color: #aaa; font-size: 0.92rem; max-width: 68ch; }}
+    .change-tags {{ display: flex; flex-wrap: wrap; gap: 6px; }}
   </style>
 </head>
 <body>
   <header>
-    <h1>Gold Arbitrage Tracker <span class="muted">V3.2</span></h1>
+    <h1>Gold Arbitrage Tracker <span class="muted">V3.3</span></h1>
     <p>Polymarket &times; Kalshi &middot; refreshed every 30 minutes via GitHub Actions &middot;
        last updated {updated} UTC &middot; <a href="index.html">back to dashboard</a></p>
   </header>
@@ -138,12 +190,17 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
       Prices are YES bid/ask as probabilities.</p>
       <div class="tablewrap">{contracts_table}</div>
     </section>
+    <section>
+      <h2>Changelog</h2>
+      <p class="explain">What's changed on this tracker since launch.</p>
+      {changelog}
+    </section>
   </main>
   <footer>
     Data: Polymarket gamma API and Kalshi trade-api v2 (both public market data).
-    Edges are computed from top-of-book quotes only - order book depth, slippage beyond
-    the touch, and Kalshi's per-order fee rounding are not modeled, so treat small edges
-    as indicative. Personal/informational use, not financial advice.
+    Capturable profit reflects top-of-book order-book depth only - deeper book levels
+    aren't walked, and Kalshi's per-order fee rounding isn't modeled - so treat marginal
+    edges as indicative. Personal/informational use, not financial advice.
   </footer>
 </body>
 </html>
@@ -399,6 +456,20 @@ def _contracts_table(contracts):
             "</table>" % "".join(rows))
 
 
+def _changelog_rows():
+    entries = []
+    for entry in CHANGELOG:
+        tags = "".join("<span class='pill'>%s</span>" % html.escape(t)
+                       for t in entry["tags"])
+        entries.append(
+            "<div class='change-entry'><div class='change-version'>%s</div>"
+            "<div><h3>%s <span class='change-date'>%s</span></h3>"
+            "<p>%s</p><div class='change-tags'>%s</div></div></div>"
+            % (html.escape(entry["version"]), html.escape(entry["title"]),
+               entry["date"], html.escape(entry["description"]), tags))
+    return "<div class='changelog'>%s</div>" % "".join(entries)
+
+
 def _fingerprint(opportunity):
     return "|".join(sorted(
         "%s:%s:%s" % (l.contract.platform, l.contract.market_id, l.action)
@@ -507,6 +578,7 @@ def main():
         ladder_chart=ladder_chart,
         n_contracts=len(contracts),
         contracts_table=_contracts_table(contracts),
+        changelog=_changelog_rows(),
     )
     OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     OUT_FILE.write_text(html_out)
