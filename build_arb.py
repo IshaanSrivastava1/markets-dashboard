@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gold arbitrage tracker (V3.7) - page builder.
+"""Gold arbitrage tracker (V3.8) - page builder.
 
 Entry point for the 30-minute GitHub Actions workflow (arb.yml). Fetches all
 live gold contracts from Polymarket + Kalshi (arb_sources), runs the detection
@@ -12,6 +12,7 @@ Run locally: venv/bin/python3 build_arb.py && open docs/arb.html
 """
 import csv
 import html
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -36,9 +37,168 @@ MARGINAL_EDGE = 0.01  # below 1c/contract: real but likely not worth the effort
 LADDER_COLORS = ["#3b82f6", "#ef4444", "#0891b2", "#d97706",
                  "#8b5cf6", "#059669", "#ec4899"]
 
+# Knowledge base for the on-page guide widget. Answers are plain text (the
+# widget renders them with textContent, so no HTML/escaping concerns) and are
+# written from the same explanations used elsewhere on the page. `followups`
+# are topic ids offered as next questions after an answer.
+GUIDE_TOPICS = [
+    {
+        "id": "overview",
+        "question": "What is this tracker?",
+        "keywords": ["tracker", "about", "purpose", "site", "page",
+                     "dashboard", "overview", "scanner"],
+        "answer": (
+            "This tracker scans every open gold-price market on Polymarket and "
+            "Kalshi every 30 minutes, converts them into one comparable format, "
+            "and flags combinations of contracts that are priced inconsistently "
+            "against each other - trades whose combined price is below their "
+            "guaranteed payout. Everything runs automatically via GitHub Actions; "
+            "there is no server."),
+        "followups": ["opportunity", "capturable", "freshness"],
+    },
+    {
+        "id": "opportunity",
+        "question": "How can a profit be “guaranteed”?",
+        "keywords": ["opportunity", "guaranteed", "arbitrage", "arb", "profit",
+                     "risk", "riskless", "locked", "logic"],
+        "answer": (
+            "Some outcomes logically force others: gold hitting $12,000 requires "
+            "it to pass $10,000 first, so a “hit $10,000” contract can never be "
+            "worth less than a “hit $12,000” one. When the market prices them "
+            "the wrong way around, buying the right pair costs less than $1 but "
+            "always pays at least $1 at resolution - whichever way gold goes. "
+            "That locked-in gap is the edge shown on each card."),
+        "followups": ["capturable", "netedge", "trading"],
+    },
+    {
+        "id": "capturable",
+        "question": "What does “capturable” mean?",
+        "keywords": ["capturable", "capture", "total", "dollar", "size",
+                     "position", "big", "much"],
+        "answer": (
+            "Capturable = the per-contract edge multiplied by how many contracts "
+            "are actually available at the flagged price in the live order "
+            "books. Both legs must be filled one-for-one, so the thinner leg "
+            "caps the position. Cards are ranked by capturable, which is why a "
+            "small edge on a deep book can outrank a big edge you could only "
+            "fill once."),
+        "followups": ["maxsize", "netedge"],
+    },
+    {
+        "id": "maxsize",
+        "question": "What is “max size” / “thin book”?",
+        "keywords": ["max", "size", "thin", "book", "contracts", "depth",
+                     "fill", "liquidity"],
+        "answer": (
+            "Max size is the number of contract pairs you could execute at the "
+            "quoted prices right now - the smaller of the two legs' top-of-book "
+            "depth. “Thin book” means one leg currently has no real size "
+            "available, so the opportunity exists on paper but can't actually "
+            "be filled. Deeper levels of the book cost more, so they aren't "
+            "counted."),
+        "followups": ["capturable", "trading"],
+    },
+    {
+        "id": "netedge",
+        "question": "What are net edge and fees?",
+        "keywords": ["net", "edge", "fee", "fees", "gross", "kalshi fee",
+                     "cost", "commission"],
+        "answer": (
+            "Net edge is the guaranteed profit per $1 contract pair after "
+            "trading fees. Kalshi charges a taker fee of about "
+            "0.07 × price × (1 − price) per contract; Polymarket charges no "
+            "trading fee. Hover the net edge number on a card to see the gross "
+            "edge and fees separately. Amber numbers are marginal - real but "
+            "probably not worth the effort."),
+        "followups": ["capturable", "trading"],
+    },
+    {
+        "id": "settle-touch",
+        "question": "Settle vs touch - what's the difference?",
+        "keywords": ["settle", "touch", "hit", "settles", "difference",
+                     "semantics", "type", "kinds"],
+        "answer": (
+            "A “settle” market asks where the price is at one exact moment "
+            "(e.g. gold above $4,600 on July 31 at 5 PM). A “touch” market asks "
+            "whether the price trades through a level at any point in a window "
+            "(e.g. gold hits $4,600 any time in July). Touching is easier than "
+            "settling above the same level, and the tracker uses that logic to "
+            "compare markets across the two platforms."),
+        "followups": ["opportunity", "ladders"],
+    },
+    {
+        "id": "ladders",
+        "question": "How do I read the price ladders chart?",
+        "keywords": ["chart", "ladder", "ladders", "graph", "lines", "read",
+                     "plot", "dashed", "solid"],
+        "answer": (
+            "Each line is one market's ladder of price levels: the probability "
+            "the platform assigns to gold reaching each level. Solid lines are "
+            "Polymarket, dashed lines are Kalshi. Consistent pricing slopes "
+            "smoothly downward - a kink, flat step, or upward blip is a "
+            "potential mispricing. Where a solid and dashed line cover the same "
+            "levels you can compare the two platforms directly. Hover any point "
+            "for its bid/ask."),
+        "followups": ["settle-touch", "opportunity"],
+    },
+    {
+        "id": "history",
+        "question": "What is “Recently spotted”?",
+        "keywords": ["recently", "spotted", "history", "log", "still open",
+                     "past", "previous", "vanish"],
+        "answer": (
+            "Every time the scanner flags an opportunity it hasn't seen before, "
+            "it logs the first sighting. “Recently spotted” shows the last ten "
+            "of those; “still open” means the same trade is still available "
+            "right now. Most edges vanish within a few scans - that's normal, "
+            "and it's also why the full history (arb_log.csv on GitHub) is more "
+            "interesting over weeks than any single snapshot."),
+        "followups": ["freshness", "overview"],
+    },
+    {
+        "id": "freshness",
+        "question": "How fresh is the data?",
+        "keywords": ["fresh", "updated", "update", "stale", "refresh", "often",
+                     "when", "last", "live", "banner"],
+        "answer": (
+            "A GitHub Actions job refetches everything every 30 minutes and "
+            "rebuilds this page; the header shows how long ago that last "
+            "happened. If the data is more than about 90 minutes old, an amber "
+            "warning banner appears - that means the auto-refresh has stalled "
+            "and the numbers should not be treated as live."),
+        "followups": ["overview", "history"],
+    },
+    {
+        "id": "trading",
+        "question": "Can I actually trade these?",
+        "keywords": ["trade", "trading", "buy", "invest", "money", "real",
+                     "act", "execute", "should"],
+        "answer": (
+            "The buttons on each card open the exact market on Polymarket or "
+            "Kalshi, so you can check the live book yourself. Be realistic: "
+            "these edges are usually a fraction of a cent per contract, sizes "
+            "are small, prices move between scans, and you'd need funded "
+            "accounts on both platforms. This page is informational - it is "
+            "not financial advice."),
+        "followups": ["netedge", "maxsize"],
+    },
+]
+
 # Newest first. A hand-maintained record of what shipped on this page - not
 # derived from git history, so it can explain *why* in plain language.
 CHANGELOG = [
+    {
+        "version": "v3.8", "date": "2026-07-13",
+        "title": "Built-in guide",
+        "tags": ["guide widget", "q&a", "no-AI"],
+        "description": (
+            "A floating “? Guide” button now opens a chat-style helper that "
+            "answers common questions about the tracker — what capturable "
+            "means, how a profit can be guaranteed, settle vs touch, fees, "
+            "data freshness and more — via suggested questions or a typed "
+            "question matched by keywords. Fully static: no AI calls, no "
+            "external requests, nothing typed ever leaves the page."),
+    },
     {
         "version": "v3.7", "date": "2026-07-12",
         "title": "History mini-cards",
@@ -231,6 +391,60 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     .hist-legs {{ display: flex; flex-direction: column; gap: 5px; }}
     .hist-stats {{ color: #888; margin-top: 8px; font-size: 0.88rem; }}
     .hist-stats b {{ font-weight: 600; font-variant-numeric: tabular-nums; color: #e5e5e5; }}
+    .guide-btn {{
+      position: fixed; right: 20px; bottom: 20px; z-index: 40;
+      background: #1e293b; color: #fff; border: 1px solid #3b82f6;
+      border-radius: 999px; padding: 10px 18px; font-size: 0.95rem;
+      cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }}
+    .guide-btn:hover {{ background: #24344d; }}
+    .guide-btn:focus-visible {{ outline: 2px solid #3b82f6; outline-offset: 2px; }}
+    .guide-panel {{
+      position: fixed; right: 20px; bottom: 74px; z-index: 41;
+      width: min(370px, calc(100vw - 32px));
+      background: #111; border: 1px solid #333; border-radius: 14px;
+      display: flex; flex-direction: column; max-height: min(70vh, 560px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }}
+    .guide-panel[hidden] {{ display: none; }}
+    .g-head {{
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px; border-bottom: 1px solid #222; font-weight: 700;
+    }}
+    .g-close {{
+      background: none; border: none; color: #888; font-size: 1.2rem;
+      cursor: pointer; padding: 2px 8px; border-radius: 6px;
+    }}
+    .g-close:hover {{ color: #fff; }}
+    .g-close:focus-visible {{ outline: 2px solid #3b82f6; }}
+    .g-msgs {{
+      overflow-y: auto; padding: 14px 16px; display: flex;
+      flex-direction: column; gap: 8px; flex: 1; min-height: 120px;
+    }}
+    .g-msg {{
+      max-width: 88%; padding: 8px 12px; border-radius: 12px;
+      font-size: 0.88rem; line-height: 1.45; white-space: pre-line;
+    }}
+    .g-bot {{ background: #1a1a1a; align-self: flex-start; border-bottom-left-radius: 4px; }}
+    .g-user {{ background: #1e293b; align-self: flex-end; border-bottom-right-radius: 4px; }}
+    .g-chips {{ display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 16px 10px; }}
+    .g-chip {{
+      background: #161616; border: 1px solid #333; border-radius: 999px;
+      color: #cfe0f5; padding: 4px 12px; font-size: 0.8rem; cursor: pointer;
+    }}
+    .g-chip:hover {{ border-color: #3b82f6; }}
+    .g-chip:focus-visible {{ outline: 2px solid #3b82f6; outline-offset: 1px; }}
+    .g-input {{ display: flex; gap: 8px; padding: 10px 16px 14px; border-top: 1px solid #222; }}
+    .g-input input {{
+      flex: 1; min-width: 0; background: #0a0a0a; border: 1px solid #333;
+      border-radius: 8px; color: #e5e5e5; padding: 8px 12px; font-size: 0.88rem;
+    }}
+    .g-input input:focus-visible {{ outline: 2px solid #3b82f6; outline-offset: 1px; }}
+    .g-input button {{
+      background: #1e293b; border: 1px solid #3b82f6; border-radius: 8px;
+      color: #fff; padding: 8px 14px; font-size: 0.88rem; cursor: pointer;
+    }}
+    .g-input button:focus-visible {{ outline: 2px solid #3b82f6; outline-offset: 1px; }}
     tr.group-head td {{
       background: #161616; font-weight: 700; font-size: 0.85rem;
       letter-spacing: 0.02em; padding: 8px 12px; border-top: 1px solid #222;
@@ -247,7 +461,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
   <header>
-    <h1>Gold Arbitrage Tracker <span class="muted">V3.7</span></h1>
+    <h1>Gold Arbitrage Tracker <span class="muted">V3.8</span></h1>
     <p>Polymarket &times; Kalshi &middot; refreshed every 30 minutes via GitHub Actions &middot;
        last updated <span id="freshness" data-updated="{updated_iso}">{updated} UTC</span>
        &middot; <a href="index.html">back to dashboard</a></p>
@@ -336,6 +550,125 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     }}
     tick();
     setInterval(tick, 60000);
+  }})();
+  </script>
+  <button id="guide-btn" class="guide-btn" type="button"
+          aria-expanded="false" aria-controls="guide-panel">? Guide</button>
+  <div id="guide-panel" class="guide-panel" role="dialog"
+       aria-label="Dashboard guide" hidden>
+    <div class="g-head"><span>Dashboard guide</span>
+      <button id="guide-close" class="g-close" type="button" aria-label="Close guide">&times;</button>
+    </div>
+    <div id="g-msgs" class="g-msgs" aria-live="polite"></div>
+    <div id="g-chips" class="g-chips"></div>
+    <form id="g-form" class="g-input">
+      <input id="g-text" type="text" placeholder="Ask about the dashboard&hellip;"
+             autocomplete="off" aria-label="Ask a question about the dashboard"/>
+      <button type="submit">Ask</button>
+    </form>
+  </div>
+  <script>
+  (function () {{
+    var TOPICS = {guide_data};
+    var byId = {{}};
+    TOPICS.forEach(function (t) {{ byId[t.id] = t; }});
+    var STARTERS = ["overview", "opportunity", "capturable", "netedge",
+                    "settle-touch", "trading"];
+
+    var btn = document.getElementById('guide-btn');
+    var panel = document.getElementById('guide-panel');
+    var closeBtn = document.getElementById('guide-close');
+    var msgs = document.getElementById('g-msgs');
+    var chips = document.getElementById('g-chips');
+    var form = document.getElementById('g-form');
+    var input = document.getElementById('g-text');
+    var greeted = false;
+
+    function bubble(cls, text) {{
+      var el = document.createElement('div');
+      el.className = 'g-msg ' + cls;
+      el.textContent = text;  // answers are plain text by construction
+      msgs.appendChild(el);
+      msgs.scrollTop = msgs.scrollHeight;
+    }}
+
+    function showChips(ids) {{
+      chips.innerHTML = '';
+      ids.forEach(function (id) {{
+        var t = byId[id];
+        if (!t) return;
+        var c = document.createElement('button');
+        c.type = 'button';
+        c.className = 'g-chip';
+        c.textContent = t.question;
+        c.addEventListener('click', function () {{ answer(t, true); }});
+        chips.appendChild(c);
+      }});
+    }}
+
+    function answer(topic, echoQuestion) {{
+      if (echoQuestion) bubble('g-user', topic.question);
+      bubble('g-bot', topic.answer);
+      showChips(topic.followups || STARTERS);
+    }}
+
+    function match(text) {{
+      var q = ' ' + text.toLowerCase() + ' ';
+      var best = null, bestScore = 0;
+      TOPICS.forEach(function (t) {{
+        var score = 0;
+        t.keywords.forEach(function (k) {{
+          if (q.indexOf(k.toLowerCase()) !== -1) score += 1;
+        }});
+        if (score > bestScore) {{ bestScore = score; best = t; }}
+      }});
+      return bestScore > 0 ? best : null;
+    }}
+
+    function greet() {{
+      if (greeted) return;
+      greeted = true;
+      bubble('g-bot', 'Hi - I can explain how this tracker works. Pick a ' +
+                      'question below or type your own.');
+      showChips(STARTERS);
+    }}
+
+    function open() {{
+      panel.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+      greet();
+      input.focus();
+    }}
+    function close() {{
+      panel.hidden = true;
+      btn.setAttribute('aria-expanded', 'false');
+      btn.focus();
+    }}
+
+    btn.addEventListener('click', function () {{
+      panel.hidden ? open() : close();
+    }});
+    closeBtn.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) {{
+      if (e.key === 'Escape' && !panel.hidden) close();
+    }});
+
+    form.addEventListener('submit', function (e) {{
+      e.preventDefault();
+      var text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      bubble('g-user', text);
+      var hit = match(text);
+      if (hit) {{
+        answer(hit, false);
+      }} else {{
+        bubble('g-bot', "I only know about this dashboard - try one of these:");
+        showChips(STARTERS);
+      }}
+    }});
+
+    if (location.hash === '#guide') open();
   }})();
   </script>
 </body>
@@ -868,6 +1201,7 @@ def main():
         n_contracts=len(contracts),
         contracts_table=_contracts_table(contracts),
         changelog=_changelog_rows(),
+        guide_data=json.dumps(GUIDE_TOPICS),
     )
     OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     OUT_FILE.write_text(html_out)
