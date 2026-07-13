@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gold arbitrage tracker (V3.6) - page builder.
+"""Gold arbitrage tracker (V3.7) - page builder.
 
 Entry point for the 30-minute GitHub Actions workflow (arb.yml). Fetches all
 live gold contracts from Polymarket + Kalshi (arb_sources), runs the detection
@@ -39,6 +39,19 @@ LADDER_COLORS = ["#3b82f6", "#ef4444", "#0891b2", "#d97706",
 # Newest first. A hand-maintained record of what shipped on this page - not
 # derived from git history, so it can explain *why* in plain language.
 CHANGELOG = [
+    {
+        "version": "v3.7", "date": "2026-07-12",
+        "title": "History mini-cards",
+        "tags": ["history redesign", "mini-cards", "less text"],
+        "description": (
+            "The \"Recently spotted\" history now uses compact mini-cards in the "
+            "same style as the live opportunity cards — concise badged trade "
+            "legs plus capturable and net edge — replacing the old wall of "
+            "auto-generated sentences. The scan log also records structured leg "
+            "summaries going forward, and older entries are reconstructed "
+            "automatically."
+        ),
+    },
     {
         "version": "v3.6", "date": "2026-07-12",
         "title": "Cleaner opportunity cards",
@@ -206,6 +219,18 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
       border-top: 1px solid #1c1c1c; padding-top: 10px;
     }}
     .opp-stats b {{ color: #e5e5e5; font-weight: 600; font-variant-numeric: tabular-nums; }}
+    .hist-list {{ display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }}
+    .hist-card {{
+      background: #0d0d0d; border: 1px solid #222; border-radius: 10px;
+      padding: 12px 16px; font-size: 0.9rem;
+    }}
+    .hist-head {{
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 10px; color: #888; margin-bottom: 8px;
+    }}
+    .hist-legs {{ display: flex; flex-direction: column; gap: 5px; }}
+    .hist-stats {{ color: #888; margin-top: 8px; font-size: 0.88rem; }}
+    .hist-stats b {{ font-weight: 600; font-variant-numeric: tabular-nums; color: #e5e5e5; }}
     tr.group-head td {{
       background: #161616; font-weight: 700; font-size: 0.85rem;
       letter-spacing: 0.02em; padding: 8px 12px; border-top: 1px solid #222;
@@ -222,7 +247,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
   <header>
-    <h1>Gold Arbitrage Tracker <span class="muted">V3.6</span></h1>
+    <h1>Gold Arbitrage Tracker <span class="muted">V3.7</span></h1>
     <p>Polymarket &times; Kalshi &middot; refreshed every 30 minutes via GitHub Actions &middot;
        last updated <span id="freshness" data-updated="{updated_iso}">{updated} UTC</span>
        &middot; <a href="index.html">back to dashboard</a></p>
@@ -365,34 +390,81 @@ def _ago(iso_str):
     return "%d min ago" % max(1, int(seconds // 60))
 
 
-def _history_rows(opportunities, limit=10):
-    """Last `limit` first-sightings from the log, newest first, flagged if the
-    same trade is still open right now."""
+def _history_legs(entry, contracts_by_id):
+    """Concise (action, label) pairs for a log entry. Prefers the structured
+    `legs` column (logged from v3.7 on); older rows are reconstructed from the
+    fingerprint via the current run's contracts; returns None if neither works."""
+    raw = entry.get("legs") or ""
+    if raw:
+        legs = []
+        for part in raw.split(";"):
+            bits = part.split("~")
+            if len(bits) >= 2:
+                legs.append((bits[0], bits[1]))
+        if legs:
+            return legs
+
+    legs = []
+    for part in (entry.get("fingerprint") or "").split("|"):
+        bits = part.split(":")
+        if len(bits) != 3:
+            return None
+        _platform, market_id, action = bits
+        contract = contracts_by_id.get(market_id)
+        if contract is None:
+            return None
+        legs.append((action, _leg_label_text(contract)))
+    return legs or None
+
+
+def _history_cards(opportunities, contracts, limit=10):
+    """Last `limit` first-sightings from the log as compact mini-cards,
+    newest first, flagged if the same trade is still open right now."""
     if not LOG_FILE.exists():
         return "<p class='empty'>Nothing logged yet.</p>"
     with LOG_FILE.open() as f:
         entries = list(csv.DictReader(f))
     if not entries:
         return "<p class='empty'>Nothing logged yet.</p>"
+
     open_now = {_fingerprint(o) for o in opportunities}
-    rows = []
+    contracts_by_id = {c.market_id: c for c in contracts}
+    cards = []
     for e in reversed(entries[-limit:]):
         seen = e.get("seen_at", "")
         absolute = seen[:16].replace("T", " ") + " UTC"
-        badge = (" <span class='pill up'>still open</span>"
-                 if e.get("fingerprint") in open_now else "")
-        cap = e.get("capturable", "")
-        cap_cell = ("$%s" % cap) if cap not in ("", None) else "-"  # blank on pre-sizing rows
-        rows.append(
-            "<tr class='divider'><td><span title='%s'>%s</span></td>"
-            "<td><span class='pill'>%s</span></td><td>%s</td><td>$%s%s</td>"
-            "<td class='muted'>%s</td></tr>"
+        open_pill = ("<span class='pill up'>still open</span>"
+                     if e.get("fingerprint") in open_now else "")
+
+        legs = _history_legs(e, contracts_by_id)
+        if legs:
+            legs_html = "".join(
+                "<div class='leg'><span class='side %s'>%s</span>"
+                "<span class='leg-desc'>%s</span></div>"
+                % ("side-yes" if action == "BUY YES" else "side-no",
+                   html.escape(action), html.escape(label))
+                for action, label in legs)
+        else:  # market no longer fetchable and row predates the legs column
+            desc = e.get("description", "")
+            desc = desc[:110] + "…" if len(desc) > 110 else desc
+            legs_html = "<div class='muted'>%s</div>" % html.escape(desc)
+
+        stats = []
+        try:
+            cap = float(e.get("capturable", ""))
+            stats.append("capturable <b class='%s'>%s</b>"
+                         % ("up" if cap > 0 else "", _fmt_money(cap)))
+        except ValueError:
+            pass  # pre-sizing rows have no capturable
+        stats.append("net <b>$%s</b>" % html.escape(e.get("net_edge", "-")))
+        cards.append(
+            "<div class='hist-card'><div class='hist-head'>"
+            "<span><span title='%s'>%s</span> &middot; <span class='pill'>%s</span></span>"
+            "%s</div><div class='hist-legs'>%s</div>"
+            "<div class='hist-stats'>%s</div></div>"
             % (html.escape(absolute), _ago(seen), html.escape(e.get("kind", "-")),
-               html.escape(cap_cell), html.escape(e.get("net_edge", "-")), badge,
-               html.escape(e.get("description", ""))))
-    return ("<div class='tablewrap'><table><tr><th>First seen</th><th>Type</th>"
-            "<th>Capturable</th><th>Net edge</th><th>What</th></tr>%s</table></div>"
-            % "".join(rows))
+               open_pill, legs_html, " &middot; ".join(stats)))
+    return "<div class='hist-list'>%s</div>" % "".join(cards)
 
 
 def _when(iso_str):
@@ -550,14 +622,13 @@ _LEG_VERB = {
 }
 
 
-def _leg_label(leg):
-    """Concise proposition for one market leg, e.g. 'Gold hits $4,600 · XAUUSD · by Jul 31'.
-    Returns an HTML-escaped string ('<' in 'settles <' becomes &lt;)."""
-    c = leg.contract
+def _leg_label_text(c):
+    """Concise plain-text proposition for a contract,
+    e.g. 'Gold hits $4,600 · XAUUSD · by Jul 31'."""
     threshold = c.threshold_low if c.threshold_low is not None else c.threshold_high
     verb = _LEG_VERB.get(c.semantics)
     if verb is None or threshold is None:
-        return html.escape(_short_title(c.title))
+        return _short_title(c.title)
     underlying = "GC" if c.underlying == GC_FUTURES else "XAUUSD"
     end = _parse_iso(c.window_end)
     when = end.strftime("%b %-d") if end else ""
@@ -565,7 +636,12 @@ def _leg_label(leg):
     parts = ["Gold %s $%s" % (verb, format(int(threshold), ",")), underlying]
     if when:
         parts.append(("by %s" if is_touch else "%s") % when)
-    return html.escape(" · ".join(parts))
+    return " · ".join(parts)
+
+
+def _leg_label(leg):
+    """HTML-escaped leg label ('<' in 'settles <' becomes &lt;)."""
+    return html.escape(_leg_label_text(leg.contract))
 
 
 def _leg_line(leg):
@@ -687,14 +763,23 @@ def _write_csvs(opportunities, now_iso):
             previous = {row["fingerprint"] for row in csv.DictReader(f)}
 
     fields = ["seen_at", "fingerprint", "kind", "net_edge", "gross_edge", "fees",
-              "max_contracts", "capturable", "expires_at", "description"]
+              "max_contracts", "capturable", "expires_at", "legs", "description"]
+
+    def serialize_legs(o):
+        # action~label~platform per leg, ';'-joined; the delimiters can't
+        # otherwise appear in labels (stripped just in case).
+        return ";".join(
+            "~".join(part.replace(";", ",").replace("~", "-") for part in
+                     (l.action, _leg_label_text(l.contract), l.contract.platform))
+            for l in o.legs)
 
     def row(o):
         return {"seen_at": now_iso, "fingerprint": _fingerprint(o), "kind": o.kind,
                 "net_edge": o.net_edge, "gross_edge": o.gross_edge, "fees": o.fees,
                 "max_contracts": o.max_contracts if o.max_contracts is not None else "",
                 "capturable": o.capturable if o.capturable is not None else "",
-                "expires_at": o.expires_at or "", "description": o.description}
+                "expires_at": o.expires_at or "", "legs": serialize_legs(o),
+                "description": o.description}
 
     CURRENT_FILE.parent.mkdir(parents=True, exist_ok=True)
     with CURRENT_FILE.open("w", newline="") as f:
@@ -778,7 +863,7 @@ def main():
         updated_iso=now_iso,
         tiles=_tiles(contracts, opportunities),
         opportunities=_opportunity_rows(opportunities),
-        history=_history_rows(opportunities),
+        history=_history_cards(opportunities, contracts),
         ladder_chart=ladder_chart,
         n_contracts=len(contracts),
         contracts_table=_contracts_table(contracts),
