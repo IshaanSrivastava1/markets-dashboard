@@ -1,21 +1,17 @@
 {
-  "body": "Quiet day, no crossings. The scanner found zero arbitrage opportunities across the 73 live contracts it checked on Kalshi and Polymarket. That's the normal state of affairs \u2014 most scans turn up nothing, and today's price grid, while busy, is internally consistent rather than mispriced.\n\nGold itself is in the middle of a strong run: spot was quoted around $4,414\u2013$4,420 on August 17, 2026, up sharply from roughly $4,070 just two weeks earlier and from about $3,400 a year ago. That rally shows up cleanly in the contract pricing: Kalshi's settle above $4,011.99 contract for August 31, 2026 trades at 96\u201398 cents, essentially priced as a near-certainty since spot is already $400 above that line, while the above $4,411.99 strike \u2014 right at today's spot \u2014 sits near a coin flip at 46\u201351 cents. Polymarket's weekly touch contracts tell the same story from a different angle: touch high $4,450 for the week of August 17 is bid 62\u201365 cents and touch low $4,350 is bid 63\u201369 cents, both elevated simply because current spot sits between those two levels and gold is volatile enough to plausibly poke through either side before the week closes.\n\nWorth noting for readers unfamiliar with the mechanics: Kalshi's gold contracts settle against a price snapshot at a fixed date and time, while Polymarket's touch contracts pay out if the price crosses the level at any point during the window \u2014 a materially different bar that naturally produces different-looking probabilities for similar strikes without implying any tradeable gap. Several of today's Kalshi strikes also show zero 24-hour volume, a reminder that a wide-looking quote on a thin book isn't the same as an executable opportunity.",
-  "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-08-17T14:00:37Z",
-  "headline": "Gold scan finds no arbitrage across 73 contracts as rally to $4,414 prices consistently",
+  "body": "Today's scan turned up two flagged arbitrage pairs, and both are the kind of near-nothing you'd expect on a normal day rather than free money. The larger one pairs a Polymarket contract on gold touching a $4,700 high in August (yes at 7.9\u00a2) against a Kalshi contract settling above $4,731.99 on August 31 (no at 91\u00a2). The combined cost is 98.9\u00a2 against a $1 payout, but after fees the net edge is only about half a cent per contract, and the book only supports 47 contracts \u2014 roughly 25 cents of total profit. That gap exists mainly because the two contracts aren't measuring the same thing: Polymarket pays out if gold ever touches $4,700 intraday during August, while Kalshi pays based on the settlement price at 5pm ET on August 31 against a different strike ($4,731.99). A touch-anytime contract and an end-of-month settle contract with different thresholds will price differently even with no real dislocation.\n\nThe second pair is entirely within Polymarket \u2014 a ladder between two \"touch low\" contracts ($4,150 and $4,100) for the week of August 17. It's logically airtight (hitting the lower strike guarantees the higher one was also hit), but the mispricing is a tenth of a cent, capped at about ten contracts, for a whole cent of profit. That's noise-level, not tradeable.\n\nContext for why so many strikes sit near $4,300\u2013$4,700: gold has been rallying hard. It traded near $4,070 on August 4 and had jumped to a $4,400 open by August 10. Gold (GC=F) December futures opened at $4,400 per troy ounce on Monday, August 10, 2026, flat compared to Friday's closing price, following a rise that had already pushed prices to $4,411.70 at 8:45 a.m. ET on August 7 amid a weak jobs report. Both platforms' contract ladders are simply repricing quickly around that move, which is the more plausible explanation than a genuine cross-platform edge.",
+  "fingerprint": "8763d9cfc9bad154",
+  "generated_at": "2026-08-17T15:19:35Z",
+  "headline": "Two flagged gold arbitrage pairs are noise, not free money",
   "model": "claude-sonnet-5",
   "sources": [
     {
-      "title": "JM Bullion Gold Price Chart",
-      "url": "https://www.jmbullion.com/charts/gold-price/"
+      "title": "Gold prices today, Monday, August 10, 2026: Highest opening price since early June",
+      "url": "https://finance.yahoo.com/personal-finance/investing/article/gold-prices-today-monday-august-10-2026-highest-opening-price-since-early-june-123242269.html"
     },
     {
-      "title": "Fortune: Current Price of Gold 08-04-2026",
-      "url": "https://fortune.com/article/current-price-of-gold-08-04-2026/"
-    },
-    {
-      "title": "Yahoo Finance: Gold price today Tuesday August 5 2025",
-      "url": "https://finance.yahoo.com/personal-finance/investing/article/gold-price-today-tuesday-august-5-2025-gold-opens-near-record-high-114904972.html"
+      "title": "Gold prices today, Friday, August 7, 2026: Gold prices continue to rise even after July jobs report misses",
+      "url": "https://finance.yahoo.com/personal-finance/investing/article/gold-prices-today-friday-august-7-2026-gold-prices-continue-to-rise-even-after-july-jobs-report-misses-122102132.html"
     }
   ]
 }
