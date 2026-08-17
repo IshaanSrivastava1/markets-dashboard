@@ -1,13 +1,17 @@
 {
-  "body": "Gold is trading in record territory, and that context explains why every strike on the board looks unusually high. Spot XAU/USD is quoted around $4,397 today, the current XAU/USD exchange rate is 4,397.50, with a previous close of 4,376.59, and the metal has been grinding higher after a strong jobs-data reaction, gold gained over 2.30% in the day and more than 7% in the week after US jobs data was mixed, with a softer Nonfarm Payrolls print. That rally is why Kalshi's above ladder for August 31, 2026 crosses 50/50 near the $4,411.99 strike, and why Polymarket's weekly touch-high contracts for $4,450\u2013$4,600 are trading with real value instead of sitting near zero \u2014 the market is pricing spot already close to those levels, not assigning them fat tail odds.\n\nThe scanner flagged one small ladder opportunity on Polymarket: buying YES on hit low $4,250 at 1.1\u00a2 and NO on hit low $4,200 at 98\u00a2 for the week of August 17, 2026, a combined cost of 99.1\u00a2 for a payout that's effectively guaranteed to be $1 (touching the deeper $4,200 low logically requires having first passed through $4,250). The edge is real but tiny \u2014 under a penny per contract, capped at 36 contracts, for about $0.32 total. That's a textbook thin-book artifact: these are deep, low-volume strike rungs on a touch-market ladder, and someone would need to clear both legs simultaneously to capture it, so it's a curiosity rather than a meaningful mispricing.\n\nOtherwise it's a quiet day. Kalshi's settle-style year-end and month-end gold brackets and Polymarket's touch-high/touch-low contracts are moving in line with each other and with spot, the Aug 18 up/down coin-flip contract sits at 49/51 as you'd expect, and no other cross-platform edges cleared the scanner's fee and liquidity filters.",
-  "fingerprint": "6c52b7dff589b7f5",
-  "generated_at": "2026-08-17T22:17:19Z",
-  "headline": "Gold's record run keeps strikes elevated; only a sub-penny Polymarket ladder quirk stands out",
+  "body": "Gold is trading in the mid-$4,300s to low-$4,400s today, which lines up with where both platforms are pricing their contracts. IFCM's live feed put spot at $4409.880 as of August 18, while FXStreet's commentary has gold recently touching a fresh two-month peak near $4,450 as rate-hike expectations for the Fed have eased. That backdrop explains why Kalshi's August settlement strikes cluster tightly around 50/50 in the $4,330\u2013$4,370 range and why Polymarket's weekly touch $4,450 contract is already trading near 0.71\u20130.76 \u2014 the market thinks that level has been reached or is very close. Nothing here looks like a dislocation; it's ordinary pricing around a genuinely volatile month for gold.\n\nThe scanner flagged exactly one cross-platform opportunity today, and it's a good example of why these need a skeptical read rather than a straight buy signal. It pairs a Polymarket YES on gold touching $4,700 in August (ask 0.08) with a Kalshi NO on settling above $4,731.99 at August 31 (ask 0.91), for a claimed net edge of under half a cent per contract after fees and only $0.43 of total capturable profit. The catch is that these aren't the same bet: Polymarket's contract resolves on any intraday touch of $4,700, while Kalshi's resolves on the settle price at a specific time on August 31 against a different threshold ($4,731.99). A scenario exists \u2014 gold spikes above $4,700 intraday but settles back below $4,731.99 \u2014 where both legs pay out, but the reverse can also happen, so the guaranteed dollar isn't truly riskless. Given the razor-thin edge and mismatched strikes/resolution rules, this reads as a modeling artifact of treating two different underlyings as equivalent, not free money.\n\nBeyond that one flagged pair, order books across both venues look normal for the size on offer, with no unusually wide bid-ask spreads or dead markets standing out. Overall, a quiet day: prices are internally consistent with each other and with where spot gold has actually been trading.",
+  "fingerprint": "537d2a543da6e239",
+  "generated_at": "2026-08-17T23:16:48Z",
+  "headline": "Gold prices near $4,400 track cleanly across platforms; flagged arbitrage is a mismatch, not free money",
   "model": "claude-sonnet-5",
   "sources": [
     {
-      "title": "TradingKey - Gold Commodities",
-      "url": "https://www.tradingkey.com/markets/commodities/gold"
+      "title": "IFCM Markets - XAUUSD Precious Metals Prices",
+      "url": "https://www.ifcmarkets.com/en/market-data/precious-metals-prices/xauusd"
+    },
+    {
+      "title": "FXStreet - Gold Commodities",
+      "url": "https://www.fxstreet.com/commodities/gold"
     }
   ]
 }
