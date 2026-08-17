@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gold arbitrage tracker (V3.8) - page builder.
+"""Gold arbitrage tracker (V3.9) - page builder.
 
 Entry point for the 30-minute GitHub Actions workflow (arb.yml). Fetches all
 live gold contracts from Polymarket + Kalshi (arb_sources), runs the detection
@@ -19,6 +19,7 @@ from pathlib import Path
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+import arb_agent
 import arb_engine
 import arb_sources
 from arb_engine import _parse_iso
@@ -187,6 +188,21 @@ GUIDE_TOPICS = [
 # Newest first. A hand-maintained record of what shipped on this page - not
 # derived from git history, so it can explain *why* in plain language.
 CHANGELOG = [
+    {
+        "version": "v3.9", "date": "2026-08-17",
+        "title": "AI market brief",
+        "tags": ["AI agent", "web search", "daily brief"],
+        "description": (
+            "A new “What's going on today” section at the top of the page, "
+            "written by an AI agent rather than a template. The agent reads "
+            "the same opportunities and contract prices shown below, decides "
+            "for itself whether the numbers need explaining, and searches the "
+            "news when they do — then writes a few paragraphs on what stands "
+            "out, citing its sources. It regenerates only when the tracked "
+            "opportunities actually change (or every six hours), so the "
+            "30-minute scan does not pay for a rewrite it doesn't need. "
+            "Informational only, never a recommendation to trade."),
+    },
     {
         "version": "v3.8", "date": "2026-07-13",
         "title": "Built-in guide",
@@ -457,11 +473,26 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
       color: #fbbf24; font-size: 0.9rem;
     }}
     .stale-banner[hidden] {{ display: none; }}
+    .brief h2 {{ display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }}
+    .brief-headline {{
+      font-size: 1.05rem; font-weight: 600; color: #e5e5e5;
+      margin: 0 0 12px; max-width: 760px;
+    }}
+    .brief-body p {{
+      color: #ccc; font-size: 0.95rem; line-height: 1.65;
+      max-width: 760px; margin: 0 0 12px;
+    }}
+    .brief-sources {{
+      margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #222;
+      font-size: 0.85rem; color: #888;
+    }}
+    .brief-sources a {{ margin-right: 4px; }}
+    .brief-meta {{ font-size: 0.78rem; color: #666; font-weight: 400; }}
   </style>
 </head>
 <body>
   <header>
-    <h1>Gold Arbitrage Tracker <span class="muted">V3.8</span></h1>
+    <h1>Gold Arbitrage Tracker <span class="muted">V3.9</span></h1>
     <p>Polymarket &times; Kalshi &middot; refreshed every 30 minutes via GitHub Actions &middot;
        last updated <span id="freshness" data-updated="{updated_iso}">{updated} UTC</span>
        &middot; <a href="index.html">back to dashboard</a></p>
@@ -469,6 +500,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   <div id="stale-banner" class="stale-banner" hidden></div>
   <div class="tiles">{tiles}</div>
   <main>
+    {brief}
     <section>
       <h2>Live opportunities</h2>
       <p class="explain">Each card is a set of trades that logically <em>cannot</em> pay out
@@ -806,6 +838,57 @@ def _when(iso_str):
         return "-"
     absolute = iso_str[:16].replace("T", " ") + " UTC"
     return "<span title='%s'>%s</span>" % (html.escape(absolute), _relative(iso_str))
+
+
+def _brief_section(brief):
+    """Render the agent-written market brief, or nothing at all.
+
+    The section disappears entirely when there is no brief -- an empty box
+    with a heading looks broken, and a missing brief is a normal state (no
+    API key configured, first run, model unavailable).
+    """
+    if not brief or not brief.get("body"):
+        return ""
+
+    # quote=False: these are text nodes, so quotes need no escaping and
+    # escaping them just litters the source with &#x27;.
+    paragraphs = "".join(
+        "<p>%s</p>" % html.escape(p.strip(), quote=False)
+        for p in brief["body"].split("\n\n") if p.strip())
+
+    sources = ""
+    links = [s for s in (brief.get("sources") or [])
+             if s.get("url", "").startswith(("http://", "https://"))]
+    if links:
+        sources = ("<div class='brief-sources'>Sources: %s</div>" % " &middot; ".join(
+            "<a href='%s' target='_blank' rel='noopener noreferrer'>%s</a>"
+            % (html.escape(s["url"], quote=True),
+               html.escape(s.get("title") or s["url"], quote=False))
+            for s in links))
+
+    meta = ""
+    if brief.get("generated_at"):
+        note = " &middot; may be out of date" if brief.get("stale") else ""
+        meta = ("<span class='brief-meta'>written %s%s</span>"
+                % (_ago(brief["generated_at"]), note))
+
+    return (
+        "<section class='brief'>"
+        "<h2>What's going on today {meta}</h2>"
+        "<p class='explain'>Written by an AI agent each time the tracked "
+        "opportunities change. It reads the same market data shown below and "
+        "searches the news when something needs explaining. Informational "
+        "only &mdash; not financial advice.</p>"
+        "<p class='brief-headline'>{headline}</p>"
+        "<div class='brief-body'>{paragraphs}</div>"
+        "{sources}"
+        "</section>"
+    ).format(
+        meta=meta,
+        headline=html.escape(brief.get("headline") or "", quote=False),
+        paragraphs=paragraphs,
+        sources=sources,
+    )
 
 
 def _tiles(contracts, opportunities):
@@ -1187,6 +1270,11 @@ def main():
     # Log first so this run's new sightings appear in its own history section.
     new_count = _write_csvs(opportunities, now_iso)
 
+    # Agent B: the market brief. Only calls the model when the opportunity set
+    # changed or the cached brief aged out, and never raises -- a failed brief
+    # drops the section rather than the build.
+    brief = arb_agent.get_brief(contracts, opportunities)
+
     fig = make_ladder_figure(contracts)
     ladder_chart = (fig.to_html(full_html=False, include_plotlyjs="cdn") if fig
                     else "<p class='empty'>No ladders with live quotes right now.</p>")
@@ -1195,6 +1283,7 @@ def main():
         updated=now.strftime("%Y-%m-%d %H:%M"),
         updated_iso=now_iso,
         tiles=_tiles(contracts, opportunities),
+        brief=_brief_section(brief),
         opportunities=_opportunity_rows(opportunities),
         history=_history_cards(opportunities, contracts),
         ladder_chart=ladder_chart,

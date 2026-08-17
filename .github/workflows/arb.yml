@@ -30,16 +30,23 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run engine tests
-        run: python -m unittest test_arb_engine
+        run: python -m unittest test_arb_engine test_arb_agent
 
       - name: Build arbitrage page
+        env:
+          # Agent B: the market brief. Absent key = the brief section is
+          # simply omitted; the rest of the page builds as before.
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_MODEL: "claude-sonnet-5"
         run: python build_arb.py
 
       - name: Commit updated page + data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/arb.html data/arb_current.csv data/arb_log.csv
+          # Explicit paths: a new output file is silently never committed
+          # unless it is listed here.
+          git add docs/arb.html data/arb_current.csv data/arb_log.csv data/arb_brief.json
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
