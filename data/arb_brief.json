@@ -1,8 +1,8 @@
 {
-  "body": "Nothing crossed the profitability bar today: the scanner returned zero live arbitrage opportunities across all Kalshi and Polymarket gold contracts. That's a legitimate quiet-day finding, not a sign the scanner is broken \u2014 it simply means no combination of legs currently pays more than the fees and slippage they'd cost.\n\nThe pricing backdrop explains why. Kalshi's settlement contracts for gold on August 31, 2026 straddle a fair value near $4,340\u20134,350 (the $4,331.99 strike shows a 0.52/0.54 yes market, tipping to 0.44/0.49 at $4,371.99), which lines up with where spot gold actually sits: gold rose to $4,339.41 per troy ounce on August 19, 2026. That figure caps a sharp bounce \u2014 gold was trading at $4,070 an ounce on August 4 \u2014 and the move higher tracked spot prices breaching $4,400 per ounce, with futures briefly touching $4,500 as gold held above $4,400 after advancing for two straight sessions on fading Fed rate-hike expectations. It has since chopped around that level, easing back under $4,400 more recently as bond yields climbed.\n\nA few Kalshi year-end strikes look odd on paper \u2014 for instance the $4,700 or above contract (bid 0.41) quotes a touch richer than $4,600 or above (bid 0.39), which shouldn't happen since a higher bar is never more likely to be cleared. This isn't free money: both books are thin, quotes go stale between updates, and crossing them in size to actually capture the gap isn't realistic, which is likely why the scanner didn't flag it. Similarly, several far out-of-the-money Kalshi strikes above $4,800 show zero 24-hour volume, so their quoted prices are indicative rather than tradeable. Overall, a calm session: prices are internally consistent with where spot gold has been trading, and no genuine cross-platform edge is currently sitting in the order books.",
+  "body": "Scanner found nothing to trade today: zero arbitrage opportunities across the Kalshi and Polymarket gold books. That's a legitimate quiet-day result, not a gap in coverage \u2014 Kalshi's contracts settle against a specific spot print at a fixed time, while Polymarket's contracts pay out if XAUUSD merely touches a level anytime during the week or month. Those are different bets on different mechanics, so their prices don't need to line up dollar-for-dollar even when they reference the same gold price.\n\nThe price levels embedded in the quotes look consistent with where gold has actually been trading. Kalshi's Aug 31 above $4,331.99 contract sits near a coin-flip (yes bid/ask 0.52/0.57), and its year-end $4,400 or above contract is similarly balanced (0.53/0.54) \u2014 both roughly bracket spot. That matches independent reporting: gold held above $4,400 an ounce on Tuesday after advancing for two straight sessions, with markets no longer fully pricing in a year-end Fed rate hike, and Forbes had the price of gold as of 8:16 a.m. ET at $4,391.41 per ounce on August 18. On Polymarket, the week-of-Aug-17 touch low $4,300 contract trades around 27-48 cents while touch high $4,450 trades around 23-29 cents \u2014 a fairly even two-sided spread, which fits a market sitting in the low-$4,300s to mid-$4,400s with real chances of testing either side.\n\nZoomed out, this fits a year that's been anything but calm: gold hit an all-time high of approximately $5,589 an ounce on January 28, then fell more than 18% from that record, before turning in its best performance in months last week. Today's flat scanner result is best read as the two platforms agreeing, not disagreeing, on a market that's simply pausing near $4,300-4,400 rather than presenting any mispricing to exploit.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-08-19T03:24:24Z",
-  "headline": "Gold arbitrage scanner finds zero opportunities as Kalshi prices track spot",
+  "generated_at": "2026-08-19T09:57:25Z",
+  "headline": "No arbitrage in gold: Kalshi and Polymarket agree, don't diverge",
   "model": "claude-sonnet-5",
   "sources": [
     {
@@ -10,8 +10,16 @@
       "url": "https://tradingeconomics.com/commodity/gold"
     },
     {
-      "title": "Intellectia - Gold Price Rally August 2026",
-      "url": "https://intellectia.ai/blog/gold-price-rally-august-2026"
+      "title": "Forbes Advisor - Gold Price",
+      "url": "https://www.forbes.com/advisor/investing/gold-price/"
+    },
+    {
+      "title": "TheStreet - Gold's Wild 2026 Ride Might Not Be Over Yet",
+      "url": "https://www.thestreet.com/investing/golds-wild-2026-ride-might-not-be-over-yet"
+    },
+    {
+      "title": "CNBC - Gold prices, metals, Fed rate hike, inflation",
+      "url": "https://www.cnbc.com/2026/08/12/gold-prices-metals-fed-rate-hike-inflation.html"
     }
   ]
 }
