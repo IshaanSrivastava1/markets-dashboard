@@ -1,25 +1,17 @@
 {
-  "body": "Scanner found nothing to trade today: zero arbitrage opportunities across the Kalshi and Polymarket gold books. That's a legitimate quiet-day result, not a gap in coverage \u2014 Kalshi's contracts settle against a specific spot print at a fixed time, while Polymarket's contracts pay out if XAUUSD merely touches a level anytime during the week or month. Those are different bets on different mechanics, so their prices don't need to line up dollar-for-dollar even when they reference the same gold price.\n\nThe price levels embedded in the quotes look consistent with where gold has actually been trading. Kalshi's Aug 31 above $4,331.99 contract sits near a coin-flip (yes bid/ask 0.52/0.57), and its year-end $4,400 or above contract is similarly balanced (0.53/0.54) \u2014 both roughly bracket spot. That matches independent reporting: gold held above $4,400 an ounce on Tuesday after advancing for two straight sessions, with markets no longer fully pricing in a year-end Fed rate hike, and Forbes had the price of gold as of 8:16 a.m. ET at $4,391.41 per ounce on August 18. On Polymarket, the week-of-Aug-17 touch low $4,300 contract trades around 27-48 cents while touch high $4,450 trades around 23-29 cents \u2014 a fairly even two-sided spread, which fits a market sitting in the low-$4,300s to mid-$4,400s with real chances of testing either side.\n\nZoomed out, this fits a year that's been anything but calm: gold hit an all-time high of approximately $5,589 an ounce on January 28, then fell more than 18% from that record, before turning in its best performance in months last week. Today's flat scanner result is best read as the two platforms agreeing, not disagreeing, on a market that's simply pausing near $4,300-4,400 rather than presenting any mispricing to exploit.",
+  "body": "Today's scan turned up zero arbitrage opportunities across the 69 live gold contracts on Kalshi and Polymarket \u2014 a quiet, unremarkable day by that measure, which is the normal outcome for this tracker. Prices on the two platforms are internally consistent with a gold spot price in the mid-$4,000s: Kalshi's Above $4,491.99 contract for August 31 sits almost exactly at a coin-flip (bid 0.48 / ask 0.52), which is what you'd expect if spot is trading right around that strike, while Polymarket's touch $4,500 in August contract is already priced near certainty (bid 0.96) since gold has evidently already traded through that level this month.\n\nThe eye-catching part of the board \u2014 strikes stacked all the way up to $5,500 \u2014 reflects where gold actually is this year, not a data error. Gold set a new all-time high of $4,524.68 an ounce before pulling back to around $4,450 as traders took profits, and separately remains on track for its biggest yearly gain since 1979, at above 70%. More recently, gold traded around $4,350 an ounce after dropping nearly 2% in the previous session, pressured by elevated global bond yields and persistent inflationary pressures. That volatility is exactly why both platforms list so many strikes above $4,500 \u2014 they're re-centering around a price that has moved quickly.\n\nWorth flagging for readers new to the dashboard: Kalshi's contracts settle against a single price at a specific timestamp (e.g., 5:00 PM EDT on a given date), while Polymarket's touch contracts pay out if price crosses a level at any point during the window. That mechanical difference means the two boards can look mismatched without any real arbitrage existing \u2014 it's a different question being asked, not free money. Several far-out-of-the-money strikes on both sides also show zero or near-zero 24-hour volume, so any apparent gap there reflects a stale or empty order book rather than a tradeable edge.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-08-19T09:57:25Z",
-  "headline": "No arbitrage in gold: Kalshi and Polymarket agree, don't diverge",
+  "generated_at": "2026-08-19T16:23:29Z",
+  "headline": "No arbitrage found across 69 gold contracts as Kalshi and Polymarket track $4,000s spot price",
   "model": "claude-sonnet-5",
   "sources": [
     {
-      "title": "Trading Economics - Gold",
+      "title": "mining.com \u2014 Gold price tops $4,500 for first time",
+      "url": "https://www.mining.com/gold-price-tops-4500-for-first-time/"
+    },
+    {
+      "title": "tradingeconomics.com \u2014 Gold commodity data",
       "url": "https://tradingeconomics.com/commodity/gold"
-    },
-    {
-      "title": "Forbes Advisor - Gold Price",
-      "url": "https://www.forbes.com/advisor/investing/gold-price/"
-    },
-    {
-      "title": "TheStreet - Gold's Wild 2026 Ride Might Not Be Over Yet",
-      "url": "https://www.thestreet.com/investing/golds-wild-2026-ride-might-not-be-over-yet"
-    },
-    {
-      "title": "CNBC - Gold prices, metals, Fed rate hike, inflation",
-      "url": "https://www.cnbc.com/2026/08/12/gold-prices-metals-fed-rate-hike-inflation.html"
     }
   ]
 }
