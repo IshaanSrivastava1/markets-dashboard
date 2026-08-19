@@ -1,17 +1,17 @@
 {
-  "body": "Today's scan turned up zero cross-platform arbitrage opportunities, and that's an unremarkable result rather than a gap in coverage \u2014 with 71 live contracts across the two venues, most of the pricing lines up sensibly with where gold actually sits right now. Spot has been running near $4,397 as of Tuesday morning per Fortune's tracker. Gold was trading at $4,397 per ounce at 8:50 a.m. Eastern Time today, continuing a rally that had gold a $13 gain from yesterday at the same hour and $1,054 higher than a year ago. A day earlier, Monday's open showed a 2.4% weekly gain at the open, with weakness in the U.S. dollar and in recent economic data contributing. That backdrop explains why Kalshi's ladder of settlement strikes is clustered so high: the $4,331.99 above strike for August 31 is pricing near even money (bid 0.47/ask 0.55), which is exactly where you'd expect it with spot already at $4,397.\n\nThe reason a scan can find nothing despite dozens of contracts is mostly mechanics. Kalshi's markets are settlement contracts \u2014 they pay out based on the official gold price at one fixed moment (5:00 PM EDT on August 31, or year-end). Polymarket's contracts are mostly touch markets that pay out if gold hits a level at any point during a window, which is a materially easier bar to clear than a single-moment settlement. So even when strikes look similar \u2014 Kalshi's August 31 $4,331.99 line versus Polymarket's weekly $4,300 touch-low (63\u201369%) \u2014 they aren't really pricing the same event, and any apparent gap reflects that rule difference rather than free money.\n\nLiquidity is also thin at the edges: many of the far out-of-the-money Kalshi strikes (above $4,571.99 and higher) show zero 24-hour volume, and several Polymarket touch markets trade only single-digit dollars a day. Thin, stale books like these are a common source of phantom edges that vanish once you try to actually fill them. Overall, a quiet day: elevated gold, no dislocations worth flagging.",
+  "body": "Nothing crossed the profitability bar today: the scanner returned zero live arbitrage opportunities across all Kalshi and Polymarket gold contracts. That's a legitimate quiet-day finding, not a sign the scanner is broken \u2014 it simply means no combination of legs currently pays more than the fees and slippage they'd cost.\n\nThe pricing backdrop explains why. Kalshi's settlement contracts for gold on August 31, 2026 straddle a fair value near $4,340\u20134,350 (the $4,331.99 strike shows a 0.52/0.54 yes market, tipping to 0.44/0.49 at $4,371.99), which lines up with where spot gold actually sits: gold rose to $4,339.41 per troy ounce on August 19, 2026. That figure caps a sharp bounce \u2014 gold was trading at $4,070 an ounce on August 4 \u2014 and the move higher tracked spot prices breaching $4,400 per ounce, with futures briefly touching $4,500 as gold held above $4,400 after advancing for two straight sessions on fading Fed rate-hike expectations. It has since chopped around that level, easing back under $4,400 more recently as bond yields climbed.\n\nA few Kalshi year-end strikes look odd on paper \u2014 for instance the $4,700 or above contract (bid 0.41) quotes a touch richer than $4,600 or above (bid 0.39), which shouldn't happen since a higher bar is never more likely to be cleared. This isn't free money: both books are thin, quotes go stale between updates, and crossing them in size to actually capture the gap isn't realistic, which is likely why the scanner didn't flag it. Similarly, several far out-of-the-money Kalshi strikes above $4,800 show zero 24-hour volume, so their quoted prices are indicative rather than tradeable. Overall, a calm session: prices are internally consistent with where spot gold has been trading, and no genuine cross-platform edge is currently sitting in the order books.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-08-18T21:17:27Z",
-  "headline": "No cross-platform gold arbitrage found as Kalshi and Polymarket prices track $4,397 spot",
+  "generated_at": "2026-08-19T03:24:24Z",
+  "headline": "Gold arbitrage scanner finds zero opportunities as Kalshi prices track spot",
   "model": "claude-sonnet-5",
   "sources": [
     {
-      "title": "Current price of gold - Fortune",
-      "url": "https://fortune.com/article/current-price-of-gold-08-18-2026/"
+      "title": "Trading Economics - Gold",
+      "url": "https://tradingeconomics.com/commodity/gold"
     },
     {
-      "title": "Gold prices today, Monday, August 17, 2026 - Yahoo Finance",
-      "url": "https://finance.yahoo.com/personal-finance/investing/article/gold-prices-today-monday-august-17-2026-gold-ticks-up-after-lower-retail-sales-report-134755206.html"
+      "title": "Intellectia - Gold Price Rally August 2026",
+      "url": "https://intellectia.ai/blog/gold-price-rally-august-2026"
     }
   ]
 }
