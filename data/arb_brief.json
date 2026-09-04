@@ -1,17 +1,8 @@
 {
-  "body": "Nothing to report on the arbitrage side today: the scanner came back with zero opportunities across all 66 live contracts on Kalshi and Polymarket. That's a legitimate quiet day finding, not a gap in coverage \u2014 the two venues price gold very differently. Kalshi's contracts are settle-price bets (e.g., Gold above $4,491.99 on August 31, 2026 at 5:00 PM EDT, currently 51\u00a2/58\u00a2) resolved off a single spot print at a fixed time, while Polymarket runs touch contracts (e.g., Will Gold hit (HIGH) $4,600 in August, 57\u00a2/62\u00a2) that pay out if price crosses the level at any point during the window, plus a separate GC-futures-linked contract. Different triggers and different underlyings mean the two boards can look similarly priced without ever being fungible, so no genuine cross-platform edge shows up.\n\nThe pricing itself looks sensible given where gold actually sits this year. After spiking to an all-time high near $5,589/oz in late January 2026, the metal cooled sharply, and J.P. Morgan noted it has been trudging above the 200-day moving average around $4,340/oz and capped for now below the 50-day moving average at $4,730/oz. That matches today's board: Kalshi's coin-flip strike for month-end sits around $4,450-4,500, and Polymarket's weekly touch odds fall off quickly above $4,650, consistent with a market that's rangebound rather than trending.\n\nOne thing worth flagging without implying mispricing: Kalshi's year-end ladder decays very slowly, with $4,500 or above at 49\u00a2/51\u00a2 and $5,500 or above still at 12\u00a2/13\u00a2. That's not an error, just thin volume on far-dated strikes plus genuinely fat-tailed expectations after a year that already produced a record over $5,500.",
+  "body": "Today's scan came back empty \u2014 zero arbitrage opportunities across the 89 live contracts checked on Kalshi and Polymarket. That's a legitimate, unremarkable finding: prices on both venues are internally consistent with no mispriced overlap large enough (after fees) to clear the scanner's threshold.\n\nThe strike ladder itself looks unusual if you're used to gold trading near $2,000-$2,600, but it lines up with where the metal actually is right now. As of 8:26 a.m. ET, gold was trading around $4,445.96 per ounce, and the all-time high was $5,597.23, set on January 29, 2026. Gold shot through the $3,500 mark and moved from $3,500 to $4,000 in just 36 days in October 2025, so today's clustering of Kalshi strikes between $4,050 and $4,800 and Polymarket's touch-levels around $4,000-$4,400 both reflect the same extraordinary run rather than a pricing anomaly on either platform.\n\nWorth flagging for anyone eyeballing the raw tables: Kalshi's contracts here are settlement bets tied to a fixed date (September 30 or December 31, 2026, at spot), while Polymarket's are \"touch\" contracts asking whether gold dips to a given low at any point during the month \u2014 a different question with a different resolution rule, so an apparent price gap between similar-looking strikes on the two platforms isn't automatically capturable. Several Kalshi strikes also show 24-hour volume of zero, meaning quoted bid-ask spreads there are stale rather than tradeable. Nothing today points to a genuine cross-platform edge; it's a quiet, structurally normal day.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-08-19T22:50:00Z",
-  "headline": "Zero arbitrage opportunities found across 66 Kalshi/Polymarket gold contracts",
+  "generated_at": "2026-09-04T02:18:39Z",
+  "headline": "Zero arbitrage found across 89 gold contracts on Kalshi and Polymarket",
   "model": "claude-sonnet-5",
-  "sources": [
-    {
-      "title": "What Was the Highest Price for Gold?",
-      "url": "https://stonexbullion.com/en/blog/what-was-the-highest-price-for-gold/"
-    },
-    {
-      "title": "Gold Prices - J.P. Morgan Global Research",
-      "url": "https://www.jpmorgan.com/insights/global-research/commodities/gold-prices"
-    }
-  ]
+  "sources": []
 }
