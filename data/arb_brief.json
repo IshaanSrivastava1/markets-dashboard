@@ -1,13 +1,21 @@
 {
-  "body": "Today's scan found zero arbitrage opportunities across all 89 live contracts on Kalshi and Polymarket \u2014 a quiet day, not a broken scanner. That absence is worth noting on its own: even though several Kalshi settle above strikes and Polymarket touch low strikes bracket similar price levels, the underlying resolution rules differ enough (one pays out on a single settlement snapshot, the other on whether spot ever touches a level during the window) that the numbers don't line up into a clean, fee-adjusted edge.\n\nThe wide dispersion in strikes reflects genuine volatility in gold itself recently. Spot XAU/USD has swung hard over the past month, rising nearly 14% in a three-week rally to its highest level since mid-May near $4,700 before correcting lower, and more recently testing support around $4,300, down roughly 3.25% on the week (FXStreet). That round trip explains why Kalshi's Sept 30, 2026 and year-end ladders span everything from $3,570 to $5,500 with real pricing at each rung, and why Polymarket's September touch-low contracts at $4,000\u2013$4,400 are trading at meaningful (not throwaway) probabilities.\n\nMechanically, most of the book looks thin: many far-out-of-the-money Kalshi strikes (e.g., the $4,690.99, $4,850.99, and $4,930.99 above contracts) show zero 24-hour volume, and Polymarket's $3,800 and $3,900 touch-low contracts trade under $100 in daily volume. Wide bid-ask gaps in that illiquid territory are a function of empty order books, not mispricing \u2014 worth keeping in mind before reading any single quote as a signal. Nothing today rises to the level of an unusual spread or a headline-driven dislocation warranting further digging.",
+  "body": "Today's scan turned up zero arbitrage opportunities across the 81 live gold contracts we track on Kalshi and Polymarket. That's a legitimate quiet-day result, not a tooling gap: the price ladders on both venues are internally consistent (each successive Kalshi settle above strike for year-end is priced lower than the one below it, as it should be), and there's no crossed or mispriced pair of legs to exploit right now. Several of the far-out-of-the-money Kalshi strikes (e.g., the $4,890.99 and $4,930.99 above contracts) show zero 24-hour volume, a reminder that thin or stale order books are the usual reason a screen might flash a false edge rather than free money.\n\nThe price levels themselves reflect gold's ongoing record run. Spot XAU/USD was quoted around $4,475 today versus a previous close near $4,388, and that's consistent with where the prediction markets are pricing risk: Kalshi's year-end $4,400 or above contract trades near 58-59 cents and $4,500 or above near 55-58 cents, implying traders see roughly a coin-flip chance of gold holding above $4,500 by December 31. Commentators have tied the recent record highs to safe-haven demand tied to geopolitical tension, a softer-dollar backdrop, and continued central-bank buying.\n\nWorth flagging for readers: Kalshi's contracts settle against a spot reference at a fixed future timestamp, while Polymarket's touch contracts pay out if gold ever hits a level during a window, and its up or down daily contract is a simple next-close comparison. These are different resolution rules on the same metal, which is exactly the kind of mechanical difference that can make two markets look mispriced relative to each other without any real edge existing.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-04T02:41:00Z",
-  "headline": "Zero arbitrage across 89 gold contracts on Kalshi and Polymarket as thin books track a volatile month",
+  "generated_at": "2026-09-04T09:16:13Z",
+  "headline": "No arbitrage found across 81 gold contracts on Kalshi and Polymarket",
   "model": "claude-sonnet-5",
   "sources": [
     {
-      "title": "FXStreet - Gold",
-      "url": "https://www.fxstreet.com/commodities/gold"
+      "title": "XAU/USD - Investing.com",
+      "url": "https://www.investing.com/currencies/xau-usd"
+    },
+    {
+      "title": "Gold price, silver: What's behind the surge? - CBS News",
+      "url": "https://www.cbsnews.com/news/gold-price-silver-whats-behind-the-surge/"
+    },
+    {
+      "title": "Gold hits record high on safe-haven demand, silver climbs to new peak - CNBC",
+      "url": "https://www.cnbc.com/2025/12/23/gold-hits-record-high-on-safe-haven-demand-silver-climbs-to-new-peak.html"
     }
   ]
 }
