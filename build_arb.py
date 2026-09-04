@@ -75,7 +75,7 @@ GUIDE_TOPICS = [
         "id": "capturable",
         "question": "What does “capturable” mean?",
         "keywords": ["capturable", "capture", "total", "dollar", "size",
-                     "position", "big", "much"],
+                     "position", "big"],
         "answer": (
             "Capturable = the per-contract edge multiplied by how many contracts "
             "are actually available at the flagged price in the live order "
