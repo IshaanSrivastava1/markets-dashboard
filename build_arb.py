@@ -173,7 +173,7 @@ GUIDE_TOPICS = [
         "id": "trading",
         "question": "Can I actually trade these?",
         "keywords": ["trade", "trading", "buy", "invest", "money", "real",
-                     "act", "execute", "should"],
+                     "execute", "should"],
         "answer": (
             "The buttons on each card open the exact market on Polymarket or "
             "Kalshi, so you can check the live book yourself. Be realistic: "
