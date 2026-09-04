@@ -1,17 +1,13 @@
 {
-  "body": "The scanner found zero arbitrage opportunities across the 81 live contracts it checked today \u2014 a quiet, unremarkable result. That's not surprising given how differently the two venues price gold: Kalshi runs settlement contracts that pay out based on the spot price at a fixed future timestamp (its Above $X series settles September 30, 2026 or year-end 2026), while Polymarket's contracts are mostly touch markets that pay out if gold ever hits a level at any point during a window, plus separate daily up/down bets. Because a settle above price and a touch this level at any point price answer genuinely different questions, the two books can show very different-looking probabilities for the same strike without any real mispricing underneath.\n\nThe one thing worth flagging isn't an arbitrage gap but the price level itself: gold is trading in the low-to-mid $4,400s today, which lines up with Kalshi's implied crossover \u2014 its $4,370.99 strike sits near even money (bid 0.54/ask 0.57) \u2014 and with third-party spot quotes. Gold's spot price was $4,402.89 per ounce as of 9:00 a.m. ET on September 4, and slightly lower than Thursday's $4,489.80, according to CNBC. That level follows a sharp round trip this year: gold corrected roughly 26% from a January all-time high near $5,595 before consolidating back near $4,000, according to Naga, and has since climbed back into the mid-$4,000s.\n\nA few Polymarket contracts show eye-catching bid/ask gaps \u2014 for example the September 8 Up or Down market quoting 0.03/0.97 \u2014 but these are near-expiry, thin-volume books rather than tradeable edges; a one-sided quote that wide usually just means almost no one is willing to take the other side this close to resolution, not that there's free money on the table.",
+  "body": "Quiet day \u2014 no arbitrage found. The scanner returned zero opportunities across both platforms today, and that's a legitimate, unremarkable result rather than a gap in coverage. Kalshi's Sept-30-2026 and year-end gold above $X settlement ladder and Polymarket's touch-price contracts on XAUUSD are pricing consistently with each other: the $4,400-and-above year-end strike sits near a coin-flip (bid 0.58 / ask 0.60), and Polymarket's hit $4,500 in September touch contract trades around 0.77-0.79, both broadly in line with spot gold trading in the mid-$4,400s right now. Gold has been unusually volatile lately \u2014 it hit an all-time record above $5,600/oz in late January 2026, then pulled back sharply, and was recently reported falling toward roughly $4,430 after a stronger-than-expected US jobs report pushed Treasury yields and the dollar higher, so the current $4,400-4,500 range reflects a real retracement, not a data error.\n\nThe one thing worth flagging for readers, not as an edge but as a caveat: several of the far-out-of-the-money Kalshi strikes (e.g., above $4,930.99, above $5,010.99) show zero 24-hour volume, and a number of Polymarket's weekly touch contracts (the week of September 7 series) have bid/ask spreads as wide as $0.01/$0.99. Those are classic thin-book quotes \u2014 a single resting order at the edge of the book, not a tradable market \u2014 and any apparent mispricing there is a liquidity artifact rather than a capturable arbitrage.\n\nBottom line: prices across Kalshi and Polymarket's gold contracts are internally consistent with each other and with the reported spot price near $4,400-4,470, and the scanner found nothing actionable. No trades, no positioning \u2014 just a market pausing after a historic run.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-04T17:19:40Z",
-  "headline": "No arbitrage across 81 gold contracts as Kalshi and Polymarket price different questions",
+  "generated_at": "2026-09-04T23:51:02Z",
+  "headline": "Gold prediction markets show no arbitrage as Kalshi, Polymarket prices align near spot",
   "model": "claude-sonnet-5",
   "sources": [
     {
-      "title": "The price of gold today, September 4, 2026 and the best places to buy",
-      "url": "https://www.cnbc.com/select/the-price-of-gold-today-september-4-2026-and-the-best-places-to-buy/"
-    },
-    {
-      "title": "Gold Price Prediction",
-      "url": "https://naga.com/en/news-and-analysis/articles/gold-price-prediction"
+      "title": "JM Bullion Gold Price Chart",
+      "url": "https://www.jmbullion.com/charts/gold-price/"
     }
   ]
 }
