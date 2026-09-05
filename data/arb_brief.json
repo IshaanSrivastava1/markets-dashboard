@@ -1,8 +1,25 @@
 {
-  "body": "Today's scan turned up zero arbitrage opportunities across either platform \u2014 a quiet day, and worth taking at face value rather than reading into it. Gold itself is trading in the mid-$4,400s as of the most recent session, down about 1.95% versus the prior day, at $4441.10, a level consistent with where the Kalshi and Polymarket strike ladders are clustered.\n\nBoth books are pricing that spot level sensibly. On Kalshi, the September 30, 2026 settle above ladder crosses 50/50 right around the $4,410 strike (bid 0.53, ask 0.56), which lines up with gold trading in the $4,400s right now \u2014 exactly what you'd expect from an efficient settlement market with the underlying already near that threshold. The year-end $4,300 or above contract sits at 0.71/0.72, implying the market sees it as fairly likely gold holds above that level through December, which is unsurprising given gold has been in a strong uptrend, recently closing at $4,539.90, its best day in weeks, after comments from a Fed governor.\n\nThe one thing worth flagging for readers, not as an opportunity but as a caution: several Polymarket weekly touch contracts (e.g., the week-of-September-7 $4,300 and $4,400 low-touch markets) show bid-ask spreads as wide as 0.01 to 0.97-0.99. That is not a mispriced market waiting to be arbed \u2014 it is simply an illiquid, thin order book with almost no resting size on one side, common in short-dated weekly contracts with low volume. Touch contracts also resolve on intraday high/low prints rather than a single settlement value, so they aren't directly comparable to Kalshi's settle-style contracts even when the strike price matches, which is why the scanner correctly excluded them from today's opportunity list.",
+  "body": "Gold's scanner turned up zero cross-platform arbitrage opportunities today, and that lines up with what's happening in the market: prices have been swinging hard day to day. Fortune's daily gold tracker put the metal at gold was trading at $4,331 per ounce at 9:10 a.m. Eastern Time on September 1, 2026, then Yahoo Finance reported Gold (GC=F) December futures opened at $4,436.40 per troy ounce on Thursday, September 3, 2026, up 0.5% compared to Wednesday's closing price, with the move attributed to hopes that a flare-up in the Iran conflict would stay contained. By Friday, September 4, futures had eased back to $4,521.40 per troy ounce as of 6:45 a.m. ET ahead of the jobs report. This kind of chop is consistent with the broader 2026 story of Fed rate-cut bets, dollar weakness, and heavy central-bank buying that analysts have been citing all year.\n\nOn the two platforms themselves, nothing screams free money. Kalshi's settle-style contracts (paying out on gold's official 5pm print) are quoted with reasonably tight spreads \u2014 the September 30 Above $4,370.99 contract sits at 0.58/0.62 with real volume behind it, and the year-end $4,400 or above strike is close by at 0.58/0.61. Polymarket's contracts are a different animal: most are \"touch\" markets that pay out if gold ever hits a level intraday, not just at settlement, and several of the weekly strikes (e.g., hit $4,400 Week of September 7) show bid/ask spreads as wide as 0.51 to 0.97. That gap is a thin-book problem, not an arbitrage signal \u2014 with almost no resting liquidity on one side, the quoted edge isn't actually fillable.\n\nBottom line: a quiet day for arbitrage, but not a quiet day for gold itself, which remains volatile in the low-$4,300s to mid-$4,500s amid geopolitical noise and rate-cut speculation.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-05T13:57:29Z",
-  "headline": "No arbitrage found as gold settles near $4,441; wide Polymarket spreads reflect illiquidity, not mispricing",
+  "generated_at": "2026-09-05T20:53:01Z",
+  "headline": "Gold arbitrage scanner finds nothing despite wild swings from $4,331 to $4,521",
   "model": "claude-sonnet-5",
-  "sources": []
+  "sources": [
+    {
+      "title": "Fortune: Current price of gold, September 1, 2026",
+      "url": "https://fortune.com/article/current-price-of-gold-09-01-2026"
+    },
+    {
+      "title": "Yahoo Finance: Gold price today, Thursday, September 3, 2026",
+      "url": "https://finance.yahoo.com/personal-finance/investing/article/gold-price-today-thursday-september-3-2026-gold-moves-higher-on-hopes-that-iran-war-reescalation-will-be-short-lived-110444019.html"
+    },
+    {
+      "title": "Yahoo Finance: Gold price today, Friday, September 4, 2026",
+      "url": "https://finance.yahoo.com/personal-finance/investing/article/gold-price-today-friday-september-4-2026-gold-price-lifts-ahead-of-jobs-report-105540094.html"
+    },
+    {
+      "title": "Morgan Stanley: Gold Price Forecast \u2014 Rally Into 2026",
+      "url": "https://www.morganstanley.com/insights/articles/gold-price-forecast-rally-into-2026"
+    }
+  ]
 }
