@@ -1,17 +1,8 @@
 {
-  "body": "Today's scan came back clean: zero arbitrage opportunities across Kalshi and Polymarket's gold contracts. That's not a glitch \u2014 it's simply a quiet day for cross-platform mispricing, and an empty list is the normal, common outcome for this scanner.\n\nThe contract prices line up with where gold actually sits right now. Spot XAUUSD was trading around $4,430-4,470 as of September 4-5, 2026, after pulling back from a sharp run toward the $4,680-4,690 area. That backdrop explains the shape of the order books: Kalshi's settle above $4,450.99 contract for September 30 is priced near a coin flip (bid 0.43 / ask 0.48), exactly what you'd expect with spot sitting just below that strike. Similarly, Polymarket's touch low $4,400 contract for September is priced high (0.83/0.86) because gold has already traded through that level this month, and the touch high $4,500 contract (0.77/0.81) reflects that a recent spike above $4,600 make a $4,500 touch look very likely even with prices now lower.\n\nOne thing worth flagging for readers rather than treating as an edge: several of Polymarket's weekly touch contracts (e.g., the September 7 weekly series) show asks sitting at 0.98-0.99 against bids of a few cents. That's not a real 90-plus-cent trading opportunity \u2014 it's a symptom of a thin, largely unquoted order book on a niche weekly contract, not a genuine mispricing versus Kalshi's monthly and year-end contracts. Aside from that illiquidity, nothing today points to a structural gap between the two venues.",
+  "body": "Today's scan turned up zero arbitrage opportunities across either platform \u2014 a quiet day, and worth taking at face value rather than reading into it. Gold itself is trading in the mid-$4,400s as of the most recent session, down about 1.95% versus the prior day, at $4441.10, a level consistent with where the Kalshi and Polymarket strike ladders are clustered.\n\nBoth books are pricing that spot level sensibly. On Kalshi, the September 30, 2026 settle above ladder crosses 50/50 right around the $4,410 strike (bid 0.53, ask 0.56), which lines up with gold trading in the $4,400s right now \u2014 exactly what you'd expect from an efficient settlement market with the underlying already near that threshold. The year-end $4,300 or above contract sits at 0.71/0.72, implying the market sees it as fairly likely gold holds above that level through December, which is unsurprising given gold has been in a strong uptrend, recently closing at $4,539.90, its best day in weeks, after comments from a Fed governor.\n\nThe one thing worth flagging for readers, not as an opportunity but as a caution: several Polymarket weekly touch contracts (e.g., the week-of-September-7 $4,300 and $4,400 low-touch markets) show bid-ask spreads as wide as 0.01 to 0.97-0.99. That is not a mispriced market waiting to be arbed \u2014 it is simply an illiquid, thin order book with almost no resting size on one side, common in short-dated weekly contracts with low volume. Touch contracts also resolve on intraday high/low prints rather than a single settlement value, so they aren't directly comparable to Kalshi's settle-style contracts even when the strike price matches, which is why the scanner correctly excluded them from today's opportunity list.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-05T07:02:32Z",
-  "headline": "No arbitrage between Kalshi and Polymarket gold contracts as prices track spot",
+  "generated_at": "2026-09-05T13:57:29Z",
+  "headline": "No arbitrage found as gold settles near $4,441; wide Polymarket spreads reflect illiquidity, not mispricing",
   "model": "claude-sonnet-5",
-  "sources": [
-    {
-      "title": "TradingView XAUUSD",
-      "url": "https://www.tradingview.com/symbols/XAUUSD/"
-    },
-    {
-      "title": "RoboForex XAU/USD Gold Forecast 2026-09-03",
-      "url": "https://roboforex.com/beginners/analytics/forex-forecast/commodities/xau-usd-gold-forecast-2026-09-03/"
-    }
-  ]
+  "sources": []
 }
