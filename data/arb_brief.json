@@ -1,13 +1,17 @@
 {
-  "body": "Quiet day \u2014 no arbitrage found. The scanner returned zero opportunities across both platforms today, and that's a legitimate, unremarkable result rather than a gap in coverage. Kalshi's Sept-30-2026 and year-end gold above $X settlement ladder and Polymarket's touch-price contracts on XAUUSD are pricing consistently with each other: the $4,400-and-above year-end strike sits near a coin-flip (bid 0.58 / ask 0.60), and Polymarket's hit $4,500 in September touch contract trades around 0.77-0.79, both broadly in line with spot gold trading in the mid-$4,400s right now. Gold has been unusually volatile lately \u2014 it hit an all-time record above $5,600/oz in late January 2026, then pulled back sharply, and was recently reported falling toward roughly $4,430 after a stronger-than-expected US jobs report pushed Treasury yields and the dollar higher, so the current $4,400-4,500 range reflects a real retracement, not a data error.\n\nThe one thing worth flagging for readers, not as an edge but as a caveat: several of the far-out-of-the-money Kalshi strikes (e.g., above $4,930.99, above $5,010.99) show zero 24-hour volume, and a number of Polymarket's weekly touch contracts (the week of September 7 series) have bid/ask spreads as wide as $0.01/$0.99. Those are classic thin-book quotes \u2014 a single resting order at the edge of the book, not a tradable market \u2014 and any apparent mispricing there is a liquidity artifact rather than a capturable arbitrage.\n\nBottom line: prices across Kalshi and Polymarket's gold contracts are internally consistent with each other and with the reported spot price near $4,400-4,470, and the scanner found nothing actionable. No trades, no positioning \u2014 just a market pausing after a historic run.",
+  "body": "Today's scan came back clean: zero arbitrage opportunities across Kalshi and Polymarket's gold contracts. That's not a glitch \u2014 it's simply a quiet day for cross-platform mispricing, and an empty list is the normal, common outcome for this scanner.\n\nThe contract prices line up with where gold actually sits right now. Spot XAUUSD was trading around $4,430-4,470 as of September 4-5, 2026, after pulling back from a sharp run toward the $4,680-4,690 area. That backdrop explains the shape of the order books: Kalshi's settle above $4,450.99 contract for September 30 is priced near a coin flip (bid 0.43 / ask 0.48), exactly what you'd expect with spot sitting just below that strike. Similarly, Polymarket's touch low $4,400 contract for September is priced high (0.83/0.86) because gold has already traded through that level this month, and the touch high $4,500 contract (0.77/0.81) reflects that a recent spike above $4,600 make a $4,500 touch look very likely even with prices now lower.\n\nOne thing worth flagging for readers rather than treating as an edge: several of Polymarket's weekly touch contracts (e.g., the September 7 weekly series) show asks sitting at 0.98-0.99 against bids of a few cents. That's not a real 90-plus-cent trading opportunity \u2014 it's a symptom of a thin, largely unquoted order book on a niche weekly contract, not a genuine mispricing versus Kalshi's monthly and year-end contracts. Aside from that illiquidity, nothing today points to a structural gap between the two venues.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-04T23:51:02Z",
-  "headline": "Gold prediction markets show no arbitrage as Kalshi, Polymarket prices align near spot",
+  "generated_at": "2026-09-05T07:02:32Z",
+  "headline": "No arbitrage between Kalshi and Polymarket gold contracts as prices track spot",
   "model": "claude-sonnet-5",
   "sources": [
     {
-      "title": "JM Bullion Gold Price Chart",
-      "url": "https://www.jmbullion.com/charts/gold-price/"
+      "title": "TradingView XAUUSD",
+      "url": "https://www.tradingview.com/symbols/XAUUSD/"
+    },
+    {
+      "title": "RoboForex XAU/USD Gold Forecast 2026-09-03",
+      "url": "https://roboforex.com/beginners/analytics/forex-forecast/commodities/xau-usd-gold-forecast-2026-09-03/"
     }
   ]
 }
