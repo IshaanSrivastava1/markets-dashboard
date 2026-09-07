@@ -1,8 +1,21 @@
 {
-  "body": "A full sweep of live Kalshi and Polymarket gold contracts turned up zero net-positive cross-platform opportunities today. That's a normal outcome \u2014 most scans find nothing, and it simply means the two platforms' order books are priced consistently with each other once fees and spreads are accounted for.\n\nThe two venues are structured very differently, which is worth understanding rather than treating as an inefficiency. Kalshi's contracts are single-point settlement bets \u2014 e.g., Gold above $4,330.99 on September 30, 2026 at 5:00 PM EDT (bid 0.55 / ask 0.65) or the year-end $4,300 or above contract (bid 0.70 / ask 0.72) \u2014 which pay out based on the spot price at one specific moment. Polymarket's contracts are mostly touch bets, like Will Gold hit (LOW) $4,300 in September (bid 0.64 / ask 0.70), which pay out if gold reaches that level at any point during the window, even briefly. A touch contract will almost always price higher than a settle contract at the same strike because there are many more paths to touching a level than to closing above it \u2014 that structural gap explains most of the apparent spread between similarly-priced contracts on the two sites, not a tradeable edge.\n\nOne spot worth noting for anyone scanning the book manually: Polymarket's Gold Up or Down on September 8 contract shows a wide 0.16 bid / 0.67 ask spread. That's a thin-book symptom rather than a signal \u2014 daily directional coin-flip markets tend to get little resting liquidity, so the quoted spread balloons even when nothing unusual is happening in the underlying. Overall, strike pricing across both platforms is internally consistent with gold trading somewhere in the low-$4,300s, and there's nothing in today's data that points to a mispricing worth flagging further.",
+  "body": "Nothing actionable today: the scanner returned zero cross-platform arbitrage opportunities, and that's the normal state \u2014 a genuine mismatch between Kalshi and Polymarket gold contracts is rare, not something to expect every session.\n\nGold itself has been unusually choppy this week. Gold (GC=F) December futures opened at $4,436.40 per troy ounce on Thursday, September 3, 2026, up 0.5% from Wednesday's closing price, with the metal trading near $4,470.70 that morning on hopes that the latest Iran escalation would stay contained. By Friday, gold was pretty steady at $4,521.40 per troy ounce, having opened at its highest price all week ahead of the August jobs report, while a same-day data feed showed gold falling to $4,432.56 on September 4, down 0.92% from the previous day \u2014 a reminder that spot quotes differ by source and timestamp, which matters when comparing to a specific settlement snapshot. The swings track Fed rate-path uncertainty and Middle East tensions: traders now see roughly a 50% probability of a September rate hike, down from about 63% a day earlier, after Fed Governor Waller said he'd favor holding rates steady if inflation keeps easing.\n\nThat volatility explains the wide fan of strikes on the board rather than any mispricing. Kalshi's contracts are settle markets \u2014 they pay out only on the single spot price at expiry (5pm ET Sept 30, or year-end) \u2014 while Polymarket's touch contracts pay out if gold crosses the level at any point during the window. So a Polymarket weekly touch-high at $4,500 pricing near 51-53\u00a2 isn't in tension with a Kalshi year-end $4,500 contract near 51-58\u00a2; they're answering different questions (touch-anytime vs. settle-at-a-moment) over different horizons, which is the mundane explanation for any strike-by-strike gaps a reader might notice on the table.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-07T05:33:11Z",
-  "headline": "Gold markets scan finds no cross-platform arbitrage today",
+  "generated_at": "2026-09-07T16:35:21Z",
+  "headline": "No arbitrage found between Kalshi and Polymarket gold contracts as prices whipsaw",
   "model": "claude-sonnet-5",
-  "sources": []
+  "sources": [
+    {
+      "title": "Gold price today, Thursday, September 3, 2026: Gold moves higher on hopes that Iran war re-escalation will be short-lived",
+      "url": "https://finance.yahoo.com/personal-finance/investing/article/gold-price-today-thursday-september-3-2026-gold-moves-higher-on-hopes-that-iran-war-reescalation-will-be-short-lived-110444019.html"
+    },
+    {
+      "title": "Gold price today, Friday, September 4, 2026: Gold price lifts ahead of jobs report",
+      "url": "https://finance.yahoo.com/personal-finance/investing/article/gold-price-today-friday-september-4-2026-gold-price-lifts-ahead-of-jobs-report-105540094.html"
+    },
+    {
+      "title": "Gold - Trading Economics",
+      "url": "https://tradingeconomics.com/commodity/gold"
+    }
+  ]
 }
