@@ -1,21 +1,17 @@
 {
-  "body": "Nothing is popping on the arbitrage side today: the scanner returned zero opportunities across both venues. That's a legitimate quiet-day result, not a gap in coverage \u2014 it's checked live order books on both Kalshi and Polymarket gold contracts and found no mispricing large enough to clear fees after accounting for fill depth.\n\nPrices tell a coherent story of a market that pulled back slightly from August's highs. Spot gold was quoted around $4,419.61 on Sept 7 by JM Bullion, a bit off the roughly $4,465 print Forbes had a few days earlier. Gold spot price today slides to $4,420 after a strong August jobs report revives Fed rate-hike bets, though physical demand holds firm, according to USAGold. That level lines up with what the order books show: Kalshi's Sept 30 above $4,410.99 settle contract sits almost at a coin flip (bid 0.44 / ask 0.48), which is exactly what you'd expect when the strike sits right on top of the current spot price.\n\nOne thing worth explaining rather than flagging as an edge: Polymarket's weekly touch $4,400 low contract trades at 0.94\u20130.95, near-certain, while a same-strike Kalshi settle contract for month-end sits closer to a coin flip. These aren't comparable products. Polymarket's contracts pay out if spot merely touches a level anytime during the week's trading, while Kalshi's settle contracts pay only on the official price at one specific moment (5:00 PM EDT, Sept 30, or year-end). A volatile week can easily touch both a $4,400 low and a $4,450 high without ending anywhere near either at settlement \u2014 which is what the pattern here suggests, not a free-money mismatch. Several of the far-out-of-the-money strikes also show zero 24h volume, a reminder that thin books can make quoted prices look more interesting than they are.",
+  "body": "Today's scan turned up zero arbitrage opportunities across either platform \u2014 a quiet, unremarkable day by that measure. Spot gold (XAU/USD) is trading in the $4,390\u2013$4,410 range this week, well off the all-time high of roughly $5,602 that gold touched on January 28, 2026, and easing further on Monday as strong US jobs data raised the odds of a near-term Fed rate move. That pullback context matters for reading today's contract book: several Kalshi strikes sit thousands of dollars above the current spot (up to $5,090 and beyond) simply because they were listed while gold was still near its January peak, not because traders expect an imminent return there.\n\nThe contract prices line up sensibly with that backdrop. Kalshi's September 30, 2026 settle above $4,370.99 contract is priced near 0.57/0.58, essentially a coin-flip, which is exactly what you'd expect for a strike sitting almost on top of today's ~$4,400 spot price. Further-out strikes fall off in a smooth, orderly way (0.44 at $4,410, 0.18 at $4,610, down to pennies above $4,900), with no gaps or crossed markets that would signal a stale quote. On Polymarket, the September touch low contracts \u2014 which pay out if gold dips to a given level intramonth rather than settles there \u2014 likewise price the $3,800\u2013$4,000 touches cheaply (2\u201313 cents), consistent with gold trading comfortably above those floors right now.\n\nThe absence of arbitrage isn't surprising: Kalshi's contracts settle on a specific end-of-window price while Polymarket's are often touch (intraday low/high) or daily up/down bets, so even when headline numbers look close, the underlying resolution rules differ enough that an apparent gap usually reflects that structural difference rather than free money. Today the books were simply well-behaved on both sides.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-07T22:56:38Z",
-  "headline": "No arbitrage today: gold pricing across Kalshi and Polymarket is internally consistent",
+  "generated_at": "2026-09-08T05:31:47Z",
+  "headline": "No arbitrage found as Kalshi and Polymarket gold contracts price consistently with $4,390-$4,410 spot",
   "model": "claude-sonnet-5",
   "sources": [
     {
-      "title": "JM Bullion Gold Price Chart",
-      "url": "https://www.jmbullion.com/charts/gold-price/"
+      "title": "TradingView - XAUUSD",
+      "url": "https://www.tradingview.com/symbols/XAUUSD/"
     },
     {
-      "title": "Forbes Advisor Gold Price",
-      "url": "https://www.forbes.com/advisor/investing/gold-price/"
-    },
-    {
-      "title": "USAGold Live Gold Price Today",
-      "url": "https://www.usagold.com/live-gold-price-today/"
+      "title": "Trading Economics - Gold",
+      "url": "https://tradingeconomics.com/commodity/gold"
     }
   ]
 }
