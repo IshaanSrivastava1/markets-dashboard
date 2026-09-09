@@ -1,21 +1,21 @@
 {
-  "body": "Today's scan turned up zero arbitrage opportunities across the 79 live contracts tracked on Kalshi and Polymarket \u2014 a quiet day, not a broken scanner. Both venues' order books are pricing gold consistently with each other: Kalshi's September 30, 2026 settle above $4,330.99 contract sits near a coin-flip (bid 0.58 / ask 0.64), and Polymarket's touch $4,450 this week contract is priced similarly (0.58/0.65), which lines up with where spot has actually been trading. News coverage this week put gold around $4,382.51 to $4,443.20 per ounce over the last 24 hours, and a separate report had it at $4,371 per ounce as of 9 a.m. Eastern on September 4, 2026. So the strike ladders on both platforms (Kalshi runs from $3,850 to $5,500; Polymarket's touch contracts cluster near $4,000\u2013$4,550) aren't arbitrary \u2014 they're bracketing the actual market.\n\nThe bigger story is the level itself: gold has had an extraordinary run. One recap noted prices have surged to record highs, up over 25% since early 2025, driven by inflation and uncertainty, and Forbes flagged an all-time high of $5,597.23 on January 29, 2026. That backdrop explains why both platforms' most actively traded strikes now sit in the $4,300\u2013$4,700 zone rather than the $2,600 range that was record territory just two years ago.\n\nMechanically, a reminder for readers: Kalshi's contracts here are settle markets, resolving on a single official price at a fixed future date (e.g., 5:00 PM EDT, Sept 30, 2026), while Polymarket's are touch markets, paying out if gold crosses a level at any point during the window. That structural difference \u2014 not mispricing \u2014 is usually why similarly-labeled contracts on the two platforms carry different odds, and it's the most common reason an apparent cross-platform edge turns out to be comparing two different bets rather than free money.",
+  "body": "Today's scan found no cross-platform arbitrage: zero opportunities across Kalshi and Polymarket gold contracts. Order books line up sensibly with each other, so there's nothing to flag on the mechanics side \u2014 just a quiet day for the tracker.\n\nThe more notable thing is simply where gold sits. Kalshi's September 2026 settlement ladder crosses 50% around the $4,390\u2013$4,410 strikes (the $4,370.99 strike bids 0.51/asks 0.54, while $4,410.99 bids 0.46/asks 0.50), implying traders see spot near that level already. That lines up with actual spot: as of Sep 09, 2026 at 1:00 AM EDT, the live Gold spot price for 1 ounce of Gold in U.S. dollars was $4,395.16, according to JM Bullion. Polymarket's touch contracts tell the same story \u2014 the September low-touch market for $4,300 is priced near even money (0.65/0.66) since spot has already been well above that level, while touches of $4,000 (0.13/0.16) and $3,900 (0.04/0.07) get progressively cheaper, a sensible monotonic curve rather than a mispricing.\n\nThe scale of the move is real, not a data glitch: both gold and silver enjoyed record-smashing rallies in 2025, surging 66% and 135% respectively over the course of the year, according to CNBC, and the climb has continued into 2026 on record inflows into gold-backed exchange traded funds (ETFs), along with strong demand for bars and coins and central-bank buying, according to Yahoo Finance UK. Some thin weekly Polymarket strikes (e.g., the week-of-Sept-7 $4,250 touch market, bid 0.04/ask 0.33) show wide spreads purely from low volume, not genuine free money \u2014 a reminder that a wide quote on a low-liquidity book is a market-depth issue, not an edge.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-09T06:15:49Z",
-  "headline": "No arbitrage found across 79 gold contracts as Kalshi and Polymarket price consistently with spot",
+  "generated_at": "2026-09-09T15:43:32Z",
+  "headline": "No cross-platform gold arbitrage found; Kalshi and Polymarket pricing align near $4,395 spot",
   "model": "claude-sonnet-5",
   "sources": [
     {
-      "title": "Forbes Advisor - Gold Price",
-      "url": "https://www.forbes.com/advisor/investing/gold-price/"
+      "title": "JM Bullion Gold Price Chart",
+      "url": "https://www.jmbullion.com/charts/gold-price/"
     },
     {
-      "title": "Fortune - Current price of gold 09-04-2026",
-      "url": "https://fortune.com/article/current-price-of-gold-09-04-2026/"
+      "title": "CNBC: gold silver price inflation Fed rate hike",
+      "url": "https://www.cnbc.com/2026/07/03/gold-silver-price-inflation-fed-rate-hike.html"
     },
     {
-      "title": "Fortune - Current price of gold 09-03-2026",
-      "url": "https://fortune.com/article/current-price-of-gold-09-03-2026/"
+      "title": "Yahoo Finance UK: Why gold prices are smashing records",
+      "url": "https://uk.finance.yahoo.com/news/why-gold-prices-smashing-records-063000651.html"
     }
   ]
 }
