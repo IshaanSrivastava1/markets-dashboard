@@ -1,17 +1,13 @@
 {
-  "body": "Quiet day for arbitrage, notable day for the underlying. The scanner found zero cross-platform opportunities in this run \u2014 nothing simultaneously mispriced between Kalshi's settlement markets and Polymarket's touch/direction markets after fees. That's a normal, unremarkable outcome and worth stating plainly rather than dressing up as news.\n\nWhat does stand out is where gold itself sits. Kalshi's Sept 30, 2026 settlement strike at $4,370.99 is trading almost exactly at the money (44\u00a2 bid / 47\u00a2 ask), and the run of deep in-the-money strikes below it (e.g., $3,810.99 at 91\u00a2/99\u00a2) implies spot is comfortably north of $4,300. That lines up with independent price checks: gold rose above $4,390 an ounce on Wednesday, supported by a weaker US dollar as investors assessed renewed inflation risks from escalating Middle East tensions and awaited key US inflation data for clues on the Federal Reserve's policy outlook, according to Trading Economics. A separate tracker put the day's move at roughly an increase of 73.96 dollars per ounce to reach 4,423.76 dollars, a 1.70% gain versus the prior day's 4,349.80, according to 150currency.com.\n\nOn the Kalshi year-end ladder, the $4,300-or-above contract sits at 70\u00a2/71\u00a2 and $4,400-or-above at 63\u00a2/64\u00a2 \u2014 traders are leaning toward gold holding these levels through December, not a certainty either way. Polymarket's September touch-low contracts tell a similar story: hitting back down to $4,000 this month is priced around 11\u00a2-14\u00a2, while a drop to $3,800 is priced near 2\u00a2-6\u00a2, reflecting fairly low expectation of a sharp reversal. Remember these are structurally different bets \u2014 Kalshi settles on the spot price at a specific expiry moment, while Polymarket's touch contracts pay out if the price hits a level at any point in the window, and its daily Up or Down contracts are simple next-day coin flips. That's exactly the kind of definitional difference that can make quotes look inconsistent side by side without actually being an arbitrage.",
+  "body": "Today's scan turned up nothing: the arbitrage tool found zero cross-platform opportunities, and that's a legitimate result rather than an error. It's a quiet day for the tracker.\n\nThe price picture explains why. Gold has been consolidating well below its recent peak: the current record high was set on January 28, 2026, at $5,602.22 per troy ounce, but as of September 10, 2026, the metal traded between $4,341.97 and $4,432.62 per ounce over the prior 24 hours, and the price is down 2.37% from a week ago and down 0.50% from a month ago (Forbes Advisor). That range lines up almost exactly with where Kalshi's above $X strikes are clustered near a coin-flip: the $4,330.99 strike sits near 51/52 and the $4,370.99 strike near 44/45, both consistent with spot bouncing around $4,340\u2013$4,430 right now. On Polymarket, the September touch low $4,300 contract (62/66) and touch high $4,400 contract (72/76) tell the same story from a different angle -- the market sees it as fairly likely gold dips to 4,300 and/or pokes above 4,400 at some point this month, without taking a strong view on which happens first.\n\nWorth remembering why overlapping strikes on the two platforms don't automatically mean free money: Kalshi's contracts here settle against a spot reading at a fixed date and time, while Polymarket's are touch contracts that pay out if gold crosses the level anytime during the whole window, even briefly. A settle-price bet and a touch-anytime bet on the same strike price are different products, so a gap between their odds reflects different exposure, not a mispricing, and it's a common reason a raw price comparison looks like an edge but isn't one.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-10T16:35:30Z",
-  "headline": "No cross-platform arbitrage found as gold rally pushes prices above $4,390",
+  "generated_at": "2026-09-10T23:36:32Z",
+  "headline": "Gold arbitrage scan finds nothing as prices consolidate below January's record high",
   "model": "claude-sonnet-5",
   "sources": [
     {
-      "title": "Trading Economics - Gold",
-      "url": "https://tradingeconomics.com/commodity/gold"
-    },
-    {
-      "title": "150currency.com",
-      "url": "https://www.150currency.com/"
+      "title": "Forbes Advisor",
+      "url": "https://www.forbes.com/advisor/investing/gold-price/"
     }
   ]
 }
