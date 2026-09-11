@@ -1,17 +1,8 @@
 {
-  "body": "Today is a quiet day on the arbitrage side. The scanner flagged just one item, and it isn't really tradable: buying YES on Polymarket's Gold hits $5,200 in September at $0.009 and NO on Gold hits $5,300 in September at $0.990 nets a theoretical $0.001 edge per contract, capped at five contracts for a grand total of one cent. That's rounding noise in a thin order book, not a real opportunity \u2014 both legs sit at the extreme tails of the distribution where liquidity is minimal, and the edge is smaller than the tick size most traders would even notice.\n\nPrices otherwise line up sensibly with where gold actually is. Kitco's live spot feed puts gold at $4,365.50 per troy ounce as of September 10, 2026, 9:44 a.m. ET, and JM Bullion has it trading around $4,373.75 per ounce this morning. That matches what the ladder of Kalshi settlement contracts implies: the Above $4,370.99 strike for September 30, 2026 is priced almost as a coin flip (39\u201344 cents), which is exactly where you'd expect a strike sitting right on top of the current spot price to trade. The full Kalshi strike ladder from $3,730 up to $5,500, and the year-end contracts running from $4,300 to $5,500, both step down smoothly in price as the threshold rises, with no gaps or inversions.\n\nNo genuine cross-platform arbitrage showed up between Kalshi and Polymarket today, which is normal rather than surprising \u2014 Kalshi's contracts settle against a single spot reading at a fixed time, while Polymarket's are \"touch\" contracts that pay out if gold crosses a level at any point in the window. Those are different bets on different mechanics, so their prices aren't meant to match up, and small gaps between them reflect that rather than free money.",
-  "fingerprint": "4fcbb58962191635",
-  "generated_at": "2026-09-11T02:24:43Z",
-  "headline": "No real arbitrage in gold markets today; prices line up with spot near $4,365-$4,374",
+  "body": "Today's scan turned up zero arbitrage opportunities across the Kalshi and Polymarket gold books \u2014 a genuinely quiet day rather than a gap in the data. Spot gold itself is trading in the $4,335\u2013$4,360 range as of this week (gold is currently trading at 4335.730, down 1.88% since yesterday... an ounce of Gold costs $4335.73), and that level lines up sensibly with where the Kalshi settle above ladder for September 30 is priced: the $4,290.99 strike sits near a coin-flip (51\u00a2 bid / 57\u00a2 ask), which is what you'd expect for a threshold close to today's spot with three weeks left on the clock.\n\nOne thing worth flagging rather than treating as free money: the Kalshi $4,130.99 and $4,170.99 above strikes for September 30 are both quoted at an identical 68\u00a2 bid / 69\u00a2 ask, even though a higher strike should always be worth less than a lower one on the same underlying and expiry. That's not a real edge \u2014 it's a symptom of a thin, infrequently-updated order book (both contracts show modest 24-hour volume), and by the time you tried to trade the size needed to matter, one side would almost certainly move. It's a good illustration of why the scanner requires a live, fillable order book before calling something an opportunity, rather than just comparing quoted mid-prices.\n\nThe Polymarket contracts in today's data use a different resolution rule entirely \u2014 touch (did gold cross $4,200 at any point in the month) rather than Kalshi's settle (where is gold at the exact 5:00 PM snapshot). Prices on the two can look inconsistent side by side without any arbitrage existing, simply because they're paying out on different events. Beyond that, the broader backdrop is a market near multi-month highs on dollar softness and rate-cut expectations (gold (XAU/USD) is trading near $4,400\u2013$4,414, up roughly 0.9% over 24 hours and holding firm after climbing more than 1% the prior session), but nothing in today's contract pricing looks dislocated from that.",
+  "fingerprint": "e3b0c44298fc1c14",
+  "generated_at": "2026-09-11T12:17:39Z",
+  "headline": "Gold prediction markets show no real arbitrage despite a stale-quote wrinkle on Kalshi",
   "model": "claude-sonnet-5",
-  "sources": [
-    {
-      "title": "Kitco Gold Charts",
-      "url": "http://www.kitco.com/charts/gold"
-    },
-    {
-      "title": "JM Bullion Gold Price Charts",
-      "url": "https://www.jmbullion.com/charts/gold-price/"
-    }
-  ]
+  "sources": []
 }
