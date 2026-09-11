@@ -1,13 +1,17 @@
 {
-  "body": "Today's scan turned up nothing: the arbitrage tool found zero cross-platform opportunities, and that's a legitimate result rather than an error. It's a quiet day for the tracker.\n\nThe price picture explains why. Gold has been consolidating well below its recent peak: the current record high was set on January 28, 2026, at $5,602.22 per troy ounce, but as of September 10, 2026, the metal traded between $4,341.97 and $4,432.62 per ounce over the prior 24 hours, and the price is down 2.37% from a week ago and down 0.50% from a month ago (Forbes Advisor). That range lines up almost exactly with where Kalshi's above $X strikes are clustered near a coin-flip: the $4,330.99 strike sits near 51/52 and the $4,370.99 strike near 44/45, both consistent with spot bouncing around $4,340\u2013$4,430 right now. On Polymarket, the September touch low $4,300 contract (62/66) and touch high $4,400 contract (72/76) tell the same story from a different angle -- the market sees it as fairly likely gold dips to 4,300 and/or pokes above 4,400 at some point this month, without taking a strong view on which happens first.\n\nWorth remembering why overlapping strikes on the two platforms don't automatically mean free money: Kalshi's contracts here settle against a spot reading at a fixed date and time, while Polymarket's are touch contracts that pay out if gold crosses the level anytime during the whole window, even briefly. A settle-price bet and a touch-anytime bet on the same strike price are different products, so a gap between their odds reflects different exposure, not a mispricing, and it's a common reason a raw price comparison looks like an edge but isn't one.",
-  "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-10T23:36:32Z",
-  "headline": "Gold arbitrage scan finds nothing as prices consolidate below January's record high",
+  "body": "Today is a quiet day on the arbitrage side. The scanner flagged just one item, and it isn't really tradable: buying YES on Polymarket's Gold hits $5,200 in September at $0.009 and NO on Gold hits $5,300 in September at $0.990 nets a theoretical $0.001 edge per contract, capped at five contracts for a grand total of one cent. That's rounding noise in a thin order book, not a real opportunity \u2014 both legs sit at the extreme tails of the distribution where liquidity is minimal, and the edge is smaller than the tick size most traders would even notice.\n\nPrices otherwise line up sensibly with where gold actually is. Kitco's live spot feed puts gold at $4,365.50 per troy ounce as of September 10, 2026, 9:44 a.m. ET, and JM Bullion has it trading around $4,373.75 per ounce this morning. That matches what the ladder of Kalshi settlement contracts implies: the Above $4,370.99 strike for September 30, 2026 is priced almost as a coin flip (39\u201344 cents), which is exactly where you'd expect a strike sitting right on top of the current spot price to trade. The full Kalshi strike ladder from $3,730 up to $5,500, and the year-end contracts running from $4,300 to $5,500, both step down smoothly in price as the threshold rises, with no gaps or inversions.\n\nNo genuine cross-platform arbitrage showed up between Kalshi and Polymarket today, which is normal rather than surprising \u2014 Kalshi's contracts settle against a single spot reading at a fixed time, while Polymarket's are \"touch\" contracts that pay out if gold crosses a level at any point in the window. Those are different bets on different mechanics, so their prices aren't meant to match up, and small gaps between them reflect that rather than free money.",
+  "fingerprint": "4fcbb58962191635",
+  "generated_at": "2026-09-11T02:24:43Z",
+  "headline": "No real arbitrage in gold markets today; prices line up with spot near $4,365-$4,374",
   "model": "claude-sonnet-5",
   "sources": [
     {
-      "title": "Forbes Advisor",
-      "url": "https://www.forbes.com/advisor/investing/gold-price/"
+      "title": "Kitco Gold Charts",
+      "url": "http://www.kitco.com/charts/gold"
+    },
+    {
+      "title": "JM Bullion Gold Price Charts",
+      "url": "https://www.jmbullion.com/charts/gold-price/"
     }
   ]
 }
