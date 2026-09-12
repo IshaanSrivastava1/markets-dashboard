@@ -1,13 +1,17 @@
 {
-  "body": "Nothing crossed the arbitrage threshold today \u2014 the scanner returned zero opportunities across both platforms, which is the normal outcome on most scans and the case here.\n\nSpot gold itself is quiet: it's trading near $4,383 as of Thursday, September 10, holding steady even as producer-price data pushed Treasury yields to nearly three-year highs. That level lines up neatly with what the Kalshi settle markets imply \u2014 the Gold price on September 30, 2026 contracts flip from favoring yes to favoring no right around the $4,330\u2013$4,370 strikes, which is where you'd expect the crossover to sit if the market is pricing today's roughly $4,383 spot with over a year of drift still to come before that settlement date.\n\nTwo things worth flagging rather than trading on: first, several far-out-of-the-money Kalshi strikes (the $3,810.99 and $3,850.99 above contracts) show zero 24-hour volume \u2014 quotes there are stale, not tradable prices. Second, don't read cross-platform quote gaps as free money without checking mechanics: Kalshi's contracts are settle markets, resolving only on the price at one specific timestamp, while Polymarket runs a mix of touch markets (paying out if gold hits a level anytime during the whole window, e.g. the $4,300 in September contract at 77\u201383\u00a2) and daily up/down bets. A touch contract and a settle contract on the same strike are pricing different questions, so a wide spread between them is usually a rule difference, not an exploitable edge. The Polymarket Up or Down on September 14 market, quoted 3\u00a2/97\u00a2, is also simply too thin and too far out to treat as informative.",
+  "body": "Today's scan turned up zero arbitrage opportunities across the 81 live gold contracts on Kalshi and Polymarket \u2014 a genuinely quiet day, not a data gap. That's not surprising given how the two boards are priced: Kalshi's September 30, 2026 settlement ladder crosses 50/50 between the $4,330.99 strike (bid 53\u00a2/ask 57\u00a2) and the $4,370.99 strike (bid 46\u00a2/ask 49\u00a2), implying the market sees spot gold sitting right around $4,350 today. That lines up with independent price data showing gold trading near $4,385\u2013$4,406 in the first half of September 2026 (USAGold, Traders Agency), so the two prediction markets and the underlying spot market are telling a consistent story.\n\nThe bigger context for readers new to the space: gold has been extraordinarily volatile this year. Gold's all-time high is $5,589.38 per ounce, reached on January 28, 2026. It has since pulled back sharply, and current commentary points to gold starting the week near $4,410 after ending last week around $4,429, with strong U.S. job growth increasing expectations of a rate hike in September \u2014 an unusual dynamic since gold typically dislikes rate hikes. That backdrop explains why Polymarket's touch contracts for round numbers like $4,300 and $4,400 in September are priced high (77\u00a2 and 81\u00a2 respectively): those are contracts that pay out if the price ever crossed the line during the month, not where it settled, so a choppy month makes both a dip and a spike easy to satisfy.\n\nOne mechanical note worth flagging: several Polymarket weekly contracts (e.g., the Week of September 14 touch markets) are quoting bid 2\u00a2 / ask 98\u00a2. That's not a real price signal \u2014 it's an empty or near-empty order book, and any scanner should ignore spreads that wide as tradeable edge rather than a hint of mispricing.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-11T19:23:38Z",
-  "headline": "No arbitrage found; gold holds near $4,383 as Kalshi strikes bracket spot price",
+  "generated_at": "2026-09-12T02:32:06Z",
+  "headline": "No arbitrage across 81 gold contracts on Kalshi and Polymarket as prices align",
   "model": "claude-sonnet-5",
   "sources": [
     {
-      "title": "USAGOLD Daily Gold Price History",
-      "url": "https://www.usagold.com/daily-gold-price-history/"
+      "title": "USAGold",
+      "url": "https://www.usagold.com/live-gold-price-today/"
+    },
+    {
+      "title": "Traders Agency",
+      "url": "https://tradersagency.com/blog/gold-price-forecast-4400-fed-rate-hike-odds"
     }
   ]
 }
