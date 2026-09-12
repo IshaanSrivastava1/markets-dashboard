@@ -1,17 +1,17 @@
 {
-  "body": "Today's scan turned up zero arbitrage opportunities across the 81 live gold contracts on Kalshi and Polymarket \u2014 a genuinely quiet day, not a data gap. That's not surprising given how the two boards are priced: Kalshi's September 30, 2026 settlement ladder crosses 50/50 between the $4,330.99 strike (bid 53\u00a2/ask 57\u00a2) and the $4,370.99 strike (bid 46\u00a2/ask 49\u00a2), implying the market sees spot gold sitting right around $4,350 today. That lines up with independent price data showing gold trading near $4,385\u2013$4,406 in the first half of September 2026 (USAGold, Traders Agency), so the two prediction markets and the underlying spot market are telling a consistent story.\n\nThe bigger context for readers new to the space: gold has been extraordinarily volatile this year. Gold's all-time high is $5,589.38 per ounce, reached on January 28, 2026. It has since pulled back sharply, and current commentary points to gold starting the week near $4,410 after ending last week around $4,429, with strong U.S. job growth increasing expectations of a rate hike in September \u2014 an unusual dynamic since gold typically dislikes rate hikes. That backdrop explains why Polymarket's touch contracts for round numbers like $4,300 and $4,400 in September are priced high (77\u00a2 and 81\u00a2 respectively): those are contracts that pay out if the price ever crossed the line during the month, not where it settled, so a choppy month makes both a dip and a spike easy to satisfy.\n\nOne mechanical note worth flagging: several Polymarket weekly contracts (e.g., the Week of September 14 touch markets) are quoting bid 2\u00a2 / ask 98\u00a2. That's not a real price signal \u2014 it's an empty or near-empty order book, and any scanner should ignore spreads that wide as tradeable edge rather than a hint of mispricing.",
+  "body": "Nothing unusual to report today: the scanner found zero cross-platform arbitrage opportunities, and the pricing that is on offer looks broadly coherent rather than mispriced. Kalshi's ladder of gold above $X on September 30, 2026 settlement contracts crosses 50/50 between the $4,330.99 strike (bid 0.54 / ask 0.57) and the $4,370.99 strike (bid 0.45 / ask 0.49), putting the market's implied fair value right around $4,350. That lines up with where gold has actually been trading: Trading Economics had spot near $4,348 on September 11, 2026, up 0.71% on the day and still 19.34% higher than a year earlier, after a rally that pushed the metal decisively above the $4,000 mark this year. A separate outlook piece similarly had gold trading near $4,366 to $4,405 depending on feed, as of the morning of September 10, 2026, so the two platforms' option-like ladders and the cash market are all telling the same story rather than diverging.\n\nThe one thing worth flagging for readers, not as an opportunity but as a caution, is how thin some of Polymarket's weekly \"touch\" contracts are. Several September-week low-touch markets (e.g., the $4,200, $4,150, $4,100 and $4,000 weekly buckets) show bids of just $0.02 against asks of $0.98 \u2014 a spread that wide is not a mispricing to exploit, it's a book with almost no resting liquidity, so the quoted mid is close to meaningless until someone actually trades near it. By contrast, the monthly Polymarket touch contracts and Kalshi's more actively traded strikes (volumes in the hundreds) have sensible, tight-ish spreads. Also worth remembering: Kalshi's contracts settle on the CME/spot fix at a specific time, while Polymarket's \"touch\" contracts pay out if price crosses the level at any point during the window \u2014 a genuine mechanical difference, not an error, and one reason the two venues' numbers for superficially similar strikes won't match exactly.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-12T02:32:06Z",
-  "headline": "No arbitrage across 81 gold contracts on Kalshi and Polymarket as prices align",
+  "generated_at": "2026-09-12T11:52:28Z",
+  "headline": "Gold markets align near $4,350; no arbitrage found, but some Polymarket books are too thin to trust",
   "model": "claude-sonnet-5",
   "sources": [
     {
-      "title": "USAGold",
-      "url": "https://www.usagold.com/live-gold-price-today/"
+      "title": "Trading Economics \u2013 Gold",
+      "url": "https://tradingeconomics.com/commodity/gold"
     },
     {
-      "title": "Traders Agency",
-      "url": "https://tradersagency.com/blog/gold-price-forecast-4400-fed-rate-hike-odds"
+      "title": "Gold Price Outlook September 2026 \u2013 GoldSilver",
+      "url": "https://goldsilver.com/industry-news/article/gold-price-outlook-september-2026/"
     }
   ]
 }
