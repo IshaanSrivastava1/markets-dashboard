@@ -1,17 +1,8 @@
 {
-  "body": "Today's scan turned up zero arbitrage opportunities across the 82 live contracts pulled from Kalshi and Polymarket. That's not unusual for gold trackers \u2014 it just means no order-book mismatch was large enough, after fees, to lock in a riskless profit right now.\n\nThe price backdrop explains why the books look the way they do. Gold has been on a strong run, with one tracker showing gold rose to 4,350.36 USD/t.oz on September 11, 2026, up 0.76% from the previous day, and noting the metal is still 19.41% higher than a year ago. A same-day price check put spot near $4,371 per ounce... a $120 decrease compared to the same time yesterday, underscoring how choppy the metal has been intraday. That volatility shows up directly in the contract pricing: Kalshi's September 30 settle above ladder crosses 50/50 around the $4,350-$4,370 strikes, while Polymarket's September touch contracts for both a $4,300 low and a $4,400 high are priced at roughly 80% likely \u2014 consistent with a market that has already swung through much of that range this month and could easily tag either level again before expiry.\n\nWorth flagging for anyone eyeing the gap between platforms: Kalshi's contracts settle on the spot price at one specific moment (5:00 PM ET on the expiry date), while Polymarket's touch contracts pay out if the price crosses the level at any point during the window. A touch contract can look expensive relative to a settle contract on the same strike without being mispriced \u2014 it's answering a different question. That structural difference, not a pricing error, is the most likely reason none of today's near-matches cleared the bar for a flagged opportunity.",
+  "body": "Nothing to report today: the scanner found zero cross-platform arbitrage opportunities. That's the normal state of affairs, not a glitch \u2014 Kalshi and Polymarket price gold very differently (Kalshi settles against a spot level at a fixed expiry, while several Polymarket markets pay out if gold merely \"touches\" a high or low at any point during the window), so apparent gaps between the two are usually artifacts of comparing different bets rather than real money left on the table.\n\nThe numbers line up sensibly with the underlying market. Spot gold is trading around $4,347.70 per troy ounce as of September 12, 2026, up $32.00 on the day, and Kalshi's September 30, 2026 settlement ladder crosses the 50% mark right around $4,330\u2013$4,370 \u2014 exactly where you'd expect it to sit with spot near $4,348 and only about two and a half weeks left before expiry. The year-end ladder (contracts settling December 31, 2026) is priced meaningfully higher, with the $4,300-and-above contract near 68-71 cents and $4,500-and-above near 51-54 cents, reflecting the market's expectation of further drift higher over the rest of the year rather than any dislocation.\n\nThe one thing worth flagging for readers is liquidity, not arbitrage: several Polymarket weekly \"touch\" contracts (e.g., the various $4,000\u2013$4,300 low-touch bets for the week of September 14) show bid-ask spreads of $0.02 to $0.98 with no recent volume. Quotes that wide on an essentially untraded book aren't a mispricing to exploit \u2014 they're just an empty order book, and a single small order could move the quoted price without reflecting any real change in the odds. Overall, a quiet, unremarkable day across both platforms.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-12T19:59:07Z",
-  "headline": "Gold prediction markets show no arbitrage despite volatile $4,350 price action",
+  "generated_at": "2026-09-13T02:30:53Z",
+  "headline": "No cross-platform gold arbitrage found; pricing differences reflect contract design, not mispricing",
   "model": "claude-sonnet-5",
-  "sources": [
-    {
-      "title": "Trading Economics - Gold",
-      "url": "https://tradingeconomics.com/commodity/gold"
-    },
-    {
-      "title": "Fortune - Current Price of Gold 09-04-2026",
-      "url": "https://fortune.com/article/current-price-of-gold-09-04-2026/"
-    }
-  ]
+  "sources": []
 }
