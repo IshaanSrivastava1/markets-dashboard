@@ -1,8 +1,17 @@
 {
-  "body": "Today's scan turned up zero arbitrage opportunities across the Kalshi and Polymarket gold books \u2014 an empty list is the most common outcome from this scanner, and today is no exception. Nothing in either book currently offers a locked-in, fee-adjusted edge large enough for the tool to flag.\n\nSpot gold is sitting in the low-$4,300s, with Kitco pegging it at $4,333.40 per troy ounce as of September 13, 2026, down $14.30 on the day, well off the all-time high of $5,589.38 reached on January 28, 2026. That level shows up cleanly in the contract structure: Kalshi's above $4,330.99 settlement contract for September 30 is priced almost exactly at a coin flip (47\u00a2/51\u00a2), which is exactly what you'd expect from a strike sitting right on top of the current spot price. Backdrop-wise, the market is digesting a hot inflation print \u2014 gold has been holding near $4,380 as hot August PPI lifted rate-hike odds toward 60% ahead of the Fed's September meeting \u2014 alongside strong investment demand, with the World Gold Council reporting gold ETFs took in $18 billion in August, pushing holdings to an all-time high of 4,189 tonnes.\n\nWorth flagging for readers comparing the two platforms: Kalshi's contracts settle against a single price snapshot at a fixed date (e.g., 5pm EDT Sept 30), while most of Polymarket's gold contracts pay out if the price merely touches a level at any point during the window. That's why Polymarket's touch $4,300 contracts trade far richer (85\u00a2/90\u00a2) than Kalshi's equivalent settle-above strike \u2014 they're answering a different, easier-to-satisfy question, not offering free money. Any apparent cross-platform gaps in these listings are best read as differences in contract mechanics or thin order books rather than real edges.",
+  "body": "Gold is trading around $4,310 per ounce today, September 14, 2026, and that level shows up consistently across both platforms rather than in any daily move worth flagging. Kalshi's September 30 settle above $4,290.99 contract sits almost exactly at a coin-flip (48\u00a2 bid/49\u00a2 ask), which is what you'd expect with spot sitting just below that strike. The scanner found zero arbitrage opportunities this run \u2014 nothing crossed the fee-adjusted threshold on either side.\n\nThe more interesting story is context, not today's tape. Gold hit an all-time high near $5,589 on January 28, 2026, then corrected sharply \u2014 one recap put the pullback at over 21% from that peak, driven by large-scale risk asset liquidations, a hawkish shift in Fed expectations, and a stronger dollar. That volatility is visible in Polymarket's weekly touch contracts: Will Gold hit (LOW) $4,250 Week of September 14 is priced 72\u00a2/74\u00a2, while the corresponding $4,400 touch-high sits at 37\u00a2/39\u00a2 \u2014 genuine two-sided uncertainty, not mispricing, since these are did it touch at any point contracts rather than settle-at-expiry contracts like Kalshi's.\n\nWorth remembering when comparing the two boards: Kalshi's gold contracts settle on the spot price at a fixed future timestamp, while most Polymarket gold markets pay out if the touch level is hit anytime during the window. That structural difference, not any pricing error, explains why superficially similar strikes carry different odds across platforms. No opportunities, quiet day, and the pricing looks like normal reaction to a still-jumpy market well off its January highs.",
   "fingerprint": "e3b0c44298fc1c14",
-  "generated_at": "2026-09-14T03:36:54Z",
-  "headline": "No arbitrage found between Kalshi and Polymarket gold books today",
+  "generated_at": "2026-09-14T15:58:21Z",
+  "headline": "Gold steady near $4,310 as no arbitrage found between Kalshi and Polymarket contracts",
   "model": "claude-sonnet-5",
-  "sources": []
+  "sources": [
+    {
+      "title": "Kitco Gold Charts",
+      "url": "http://www.kitco.com/charts/gold"
+    },
+    {
+      "title": "Why Is Gold Crashing? How Low Can Gold Go and Gold Price Prediction 2026",
+      "url": "https://www.financemagnates.com/trending/why-is-gold-crashing-how-low-can-gold-go-and-gold-price-prediction-2026/"
+    }
+  ]
 }
