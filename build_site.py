@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Orchestrator: refresh both trackers' data and regenerate docs/index.html.
 
-This is the entry point run by the GitHub Actions workflow. Each tracker's
-update is wrapped in try/except so one failing data source degrades to a
-notice rather than blanking the whole page (it falls back to stored CSV data).
+Every project on the dashboard is archived, so this renders the stored CSV
+data only and never fetches - rebuilding must not change a frozen chart.
 """
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,12 +16,7 @@ OUT_FILE = BASE_DIR / "docs" / "index.html"
 
 def build_gold_section():
     note = ""
-    try:
-        rows, labels = gold_tracker.update_data()
-    except Exception as exc:
-        print(f"[gold] live update failed, using stored data: {exc}")
-        note = "<p class='error'>Live update unavailable today, showing last stored data.</p>"
-        rows, labels = gold_tracker.read_history()
+    rows, labels = gold_tracker.read_history()
     fig = gold_tracker.make_figure(rows, labels)
     summary = gold_tracker.make_summary(rows, labels)
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn")
@@ -31,12 +25,7 @@ def build_gold_section():
 
 def build_mu_section():
     note = ""
-    try:
-        rows = mu_tracker.update_data()
-    except Exception as exc:
-        print(f"[mu] live update failed, using stored data: {exc}")
-        note = "<p class='error'>Live update unavailable today, showing last stored data.</p>"
-        rows = mu_tracker.load_rows()
+    rows = mu_tracker.load_rows()
     emas = mu_tracker.compute_emas(rows)
     fig = mu_tracker.make_figure(rows, emas)
     summary = mu_tracker.compute_summary(rows, emas)
@@ -97,7 +86,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <body>
   <header>
     <h1>Markets Dashboard</h1>
-    <p>Auto-updated daily via GitHub Actions. Last updated {updated} UTC</p>
+    <p>Archive of past market-tracking projects. Last rebuilt {updated} UTC</p>
   </header>
   <nav class="tabs">
     <button class="tab-btn active" data-tab="current" type="button">Current Projects</button>
@@ -105,16 +94,22 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   </nav>
   <main>
     <div id="current" class="tab-panel">
-      <section id="arb">
-        <h2>Gold Arbitrage Tracker (V3.9)</h2>
-        <p class="description">Scans every open gold-price market on Polymarket and
-        Kalshi every 30 minutes, normalizes them into one schema, and flags
-        combinations of contracts that are logically mispriced against each other
-        (net of fees) &mdash; guaranteed-payout trades priced below their payout.</p>
-        <p><a href="arb.html">Open the live tracker &rarr;</a></p>
+      <section>
+        <h2>Nothing here yet</h2>
+        <p class="description">A new project is in the works. In the meantime,
+        past projects live under Archived Projects.</p>
       </section>
     </div>
     <div id="archived" class="tab-panel" hidden>
+      <section id="arb">
+        <h2>old - V3.9 Gold Arbitrage Tracker</h2>
+        <p class="description">Scanned every open gold-price market on Polymarket and
+        Kalshi, normalized them into one schema, and flagged combinations of contracts
+        that were logically mispriced against each other (net of fees), with an AI agent
+        writing a daily brief on top. Ran from July to October 2026; the page below is
+        its final snapshot and no longer updates.</p>
+        <p><a href="arb.html">Open the archived tracker &rarr;</a></p>
+      </section>
       <section id="gold">
         <h2>old - V2 Gold (GC) June 2026 Settlement Odds</h2>
         {gold_note}

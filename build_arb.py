@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Gold arbitrage tracker (V3.9) - page builder.
 
+ARCHIVED 2026-10-09: the arb.yml workflow is disabled and docs/arb.html is
+frozen as the final snapshot. Re-enable with
+  gh workflow enable "Update arbitrage tracker" -R IshaanSrivastava1/markets-dashboard
+and remove the archived banner from PAGE_TEMPLATE if it ever comes back.
+
 Entry point for the 30-minute GitHub Actions workflow (arb.yml). Fetches all
 live gold contracts from Polymarket + Kalshi (arb_sources), runs the detection
 engine (arb_engine), and writes:
@@ -189,6 +194,16 @@ GUIDE_TOPICS = [
 # derived from git history, so it can explain *why* in plain language.
 CHANGELOG = [
     {
+        "version": "v3.9", "date": "2026-10-09",
+        "title": "Archived",
+        "tags": ["archived", "final snapshot"],
+        "description": (
+            "Retired to make room for a new project. The 30-minute scans were "
+            "switched off, so this page is the tracker's final snapshot and no "
+            "longer updates. Real opportunities had become rare by then: 374 "
+            "first sightings in July, 25 in August, 8 in September."),
+    },
+    {
         "version": "v3.9", "date": "2026-08-17",
         "title": "AI market brief",
         "tags": ["AI agent", "web search", "daily brief"],
@@ -312,7 +327,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Gold Arbitrage Tracker - Polymarket vs Kalshi</title>
+  <title>Gold Arbitrage Tracker (archived) - Polymarket vs Kalshi</title>
   <meta name="description" content="Auto-updating scan of Polymarket and Kalshi gold markets for cross-platform arbitrage and mispricings. Refreshed every 30 minutes via GitHub Actions."/>
   <style>
     :root {{ color-scheme: dark; }}
@@ -492,12 +507,12 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
   <header>
-    <h1>Gold Arbitrage Tracker <span class="muted">V3.9</span></h1>
-    <p>Polymarket &times; Kalshi &middot; refreshed every 30 minutes via GitHub Actions &middot;
-       last updated <span id="freshness" data-updated="{updated_iso}">{updated} UTC</span>
+    <h1>Gold Arbitrage Tracker <span class="muted">V3.9 &middot; archived</span></h1>
+    <p>Polymarket &times; Kalshi &middot; archived October 2026 &middot;
+       final scan <span id="freshness" data-updated="{updated_iso}">{updated} UTC</span>
        &middot; <a href="index.html">back to dashboard</a></p>
   </header>
-  <div id="stale-banner" class="stale-banner" hidden></div>
+  <div class="stale-banner">This tracker is archived. Its automatic scans stopped in October 2026, so everything below is the final snapshot, not live data.</div>
   <div class="tiles">{tiles}</div>
   <main>
     {brief}
@@ -554,7 +569,6 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   <script>
   (function () {{
     var el = document.getElementById('freshness');
-    var banner = document.getElementById('stale-banner');
     if (!el) return;
     var updated = new Date(el.getAttribute('data-updated'));
     var absolute = el.textContent.trim();
@@ -570,15 +584,8 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
     }}
     function tick() {{
       var age = Date.now() - updated.getTime();
-      el.textContent = absolute + ' \\u00b7 updated ' + fmt(age);
+      el.textContent = absolute + ' \\u00b7 ' + fmt(age);
       el.title = absolute;
-      if (age > 90 * 60 * 1000) {{
-        banner.hidden = false;
-        banner.textContent = '\\u26a0 Auto-refresh may have stalled \\u2014 this data was last ' +
-          'refreshed ' + fmt(age) + ' (it normally updates every 30 minutes).';
-      }} else {{
-        banner.hidden = true;
-      }}
     }}
     tick();
     setInterval(tick, 60000);
